@@ -17,7 +17,7 @@ blueprint:
     
     - Click the **on** button if the light is already on (optional). 
     "
-  source_url: https://gist.github.com/trilorian/ee957a682ab6a3765e8fbb19502e9bfb
+  source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
   domain: automation
   input:
     remote_device:
@@ -199,9 +199,9 @@ trigger:
     event_type: zha_event
     event_data:
       device_id: "{{ zha_remote }}"
-      endpoint_id: 1
+      command: "stop_with_on_off"
       cluster_id: 8
-      command: stop_with_on_off
+      endpoint_id: 1
     id: release-zha
 action:
   - variables:
@@ -227,14 +227,7 @@ action:
                         id:
                           - click-on-zha
                     sequence:
-                      - wait_for_trigger:
-                          - platform: event
-                            event_type: zha_event
-                            event_data:
-                              device_id: "{{ zha_remote }}"
-                              command: "on"
-                              cluster_id: 6
-                              endpoint_id: 1
+                      - wait_for_trigger: click-on-zha
                         timeout:
                           milliseconds: !input helper_double_click_delay
                         continue_on_timeout: true
@@ -275,14 +268,7 @@ action:
                         id:
                           - click-off-zha
                     sequence:
-                      - wait_for_trigger:
-                          - platform: event
-                            event_type: zha_event
-                            event_data:
-                              device_id: "{{ zha_remote }}"
-                              command: "off"
-                              cluster_id: 6
-                              endpoint_id: 1
+                      - wait_for_trigger: click-off-zha
                         timeout:
                           milliseconds: !input helper_double_click_delay
                         continue_on_timeout: true
@@ -311,14 +297,7 @@ action:
                                   id:
                                     - hold-on-zha
                               sequence:
-                                - wait_for_trigger:
-                                    - platform: event
-                                      event_type: zha_event
-                                      event_data:
-                                        device_id: "{{ zha_remote }}"
-                                        command: "stop_with_on_off"
-                                        cluster_id: 8
-                                        endpoint_id: 1
+                                - wait_for_trigger: release-zha
                                   timeout:
                                     milliseconds: !input helper_hold_delay
                                   continue_on_timeout: true
@@ -346,14 +325,7 @@ action:
                                   id:
                                     - hold-off-zha
                               sequence:
-                                - wait_for_trigger:
-                                    - platform: event
-                                      event_type: zha_event
-                                      event_data:
-                                        device_id: "{{ zha_remote }}"
-                                        command: "stop_with_on_off"
-                                        cluster_id: 8
-                                        endpoint_id: 1
+                                - wait_for_trigger: release-zha
                                   timeout:
                                     milliseconds: !input helper_hold_delay
                                   continue_on_timeout: true
