@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.28)
+  description: "## IKEA RODRET Dimmer remote (v1.29)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -53,8 +53,7 @@ blueprint:
     on_hold_action:
       name: On - Hold action
       description:
-        Choose action(s) to run when **on** button is **clicked and held**.
-        **On - Hold event** must be exposed.
+        Choose action(s) to run when **on** button is **clicked and held**. **On - Hold event** must be exposed.
       default: []
       selector:
         action: {}
@@ -68,8 +67,7 @@ blueprint:
     off_hold_action:
       name: Off - Hold action
       description:
-        Choose action(s) to run when **off** button is **clicked and held**.
-        **Off - Hold event** must be exposed.
+        Choose action(s) to run when **off** button is **clicked and held**. **Off - Hold event** must be exposed.
       default: []
       selector:
         action: {}
@@ -83,8 +81,7 @@ blueprint:
     on_double_click_action:
       name: On - Double click action
       description:
-        Choose action(s) to run when clicking the **on** button twice in **Helper - Double click
-        delay** interval. **On - Double click event** must be exposed.
+        Choose action(s) to run when clicking the **on** button twice in **Helper - Double click delay** interval. **On - Double click event** must be exposed.
       default: []
       selector:
         action: {}
@@ -98,23 +95,21 @@ blueprint:
     off_double_click_action:
       name: Off - Double click action
       description:
-        Choose action(s) to run when clicking the **off** button twice in **Helper - Double click
-        delay** interval. **Off - Double click event** must be exposed.
+        Choose action(s) to run when clicking the **off** button twice in **Helper - Double click delay** interval. **Off - Double click event** must be exposed.
       default: []
       selector:
         action: {}
     on_if_on_enabled:
       name: On - if on event
       description:
-        Choose if the on action should be overridden, if the chosen device is already on. 
+        Choose if the on action should be overridden, if the chosen device is already on.
       default: false
       selector:
         boolean: {}
     on_if_on_light:
       name: On if on light
       description:
-        If the on event is overriden, choose the light for which to test the state. 
-        **On - if on event** must be exposed.
+        If the on event is overriden, choose the light for which to test the state. **On - if on event** must be exposed.
       selector:
         entity:
           filter:
@@ -131,8 +126,7 @@ blueprint:
     helper_double_click_delay:
       name: Helper - Double click delay
       description:
-        Max delay between the first and the second button click for the **Double click events**. 
-        Change this value if you notice that the double click action is not triggered properly.
+        Max delay between the first and the second button click for the **Double click events**. Change this value if you notice that the double click action is not triggered properly.
       default: 250
       selector:
         number:
