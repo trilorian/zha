@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.30)
+  description: "## IKEA RODRET Dimmer remote (v1.31)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
