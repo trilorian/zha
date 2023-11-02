@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.32)
+  description: "## IKEA RODRET Dimmer remote (v1.33)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -227,8 +227,7 @@ action:
                         id:
                           - click-on-zha
                     sequence:
-                      - wait_for_trigger:
-                        - click-on-zha
+                      - wait_for_trigger: "{{ click-on-zha }}"
                         timeout:
                           milliseconds: !input helper_double_click_delay
                         continue_on_timeout: true
@@ -269,8 +268,7 @@ action:
                         id:
                           - click-off-zha
                     sequence:
-                      - wait_for_trigger:
-                        - click-off-zha
+                      - wait_for_trigger: "{{ click-off-zha }}"
                         timeout:
                           milliseconds: !input helper_double_click_delay
                         continue_on_timeout: true
@@ -299,8 +297,7 @@ action:
                                   id:
                                     - hold-on-zha
                               sequence:
-                                - wait_for_trigger:
-                                  - release-zha
+                                - wait_for_trigger: "{{ release-zha }}"
                                   timeout:
                                     milliseconds: !input helper_hold_delay
                                   continue_on_timeout: true
@@ -328,8 +325,7 @@ action:
                                   id:
                                     - hold-off-zha
                               sequence:
-                                - wait_for_trigger:
-                                  - release-zha
+                                - wait_for_trigger: "{{ release-zha }}"
                                   timeout:
                                     milliseconds: !input helper_hold_delay
                                   continue_on_timeout: true
