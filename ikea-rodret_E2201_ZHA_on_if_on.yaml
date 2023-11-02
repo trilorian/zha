@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.23)
+  description: "## IKEA RODRET Dimmer remote (v1.24)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -160,7 +160,7 @@ trigger:
       command: "on"
       cluster_id: 6
       endpoint_id: 1
-    id: press-on-zha
+    id: click-on-zha
   - platform: event
     event_type: zha_event
     event_data:
@@ -168,7 +168,7 @@ trigger:
       command: "off"
       cluster_id: 6
       endpoint_id: 1
-    id: press-off-zha
+    id: click-off-zha
   - platform: event
     event_type: zha_event
     event_data:
@@ -204,7 +204,7 @@ action:
       - conditions:
           - condition: trigger
             id:
-              - press-on-zha
+              - click-on-zha
         sequence:
           - if:
               - condition: template
@@ -214,7 +214,7 @@ action:
                   - conditions:
                       - condition: trigger
                         id:
-                          - press-on-zha
+                          - click-on-zha
                     sequence:
                       - wait_for_trigger:
                           - platform: event
@@ -248,7 +248,7 @@ action:
       - conditions:
           - condition: trigger
             id:
-              - press-off-zha
+              - click-off-zha
         sequence:
           - if:
               - condition: template
@@ -258,7 +258,7 @@ action:
                   - conditions:
                       - condition: trigger
                         id:
-                          - press-off-zha
+                          - click-off-zha
                     sequence:
                       - wait_for_trigger:
                           - platform: event
