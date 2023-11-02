@@ -372,4 +372,4 @@ action:
                                         value_template: "{{ wait.trigger.idx is defined }}"
                                     then:
                                       - stop: button released
-            else: !input on_click_action
+            else: !input off_click_action
