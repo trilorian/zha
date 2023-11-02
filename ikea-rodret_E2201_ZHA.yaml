@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.40)
+  description: "## IKEA RODRET Dimmer remote (v1.41)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -238,19 +238,55 @@ action:
                         timeout:
                           milliseconds: !input helper_double_click_delay
                         continue_on_timeout: true
-                      - if:
-                          - condition: template
-                            value_template: "{{ trigger.idx == 0 }}"
-                        then: !input on_double_click_action
-                        else:
-                          - if:
+                      - choose:
+                          - conditions:
                               - condition: template
-                                value_template: "{{ on_if_on_enabled }}"
-                              - condition: state
-                                entity_id: !input on_if_on_light
-                                state: "on"
-                            then: !input on_if_on_action
-                            else: !input on_click_action
+                                value_template: '{{ wait.trigger == none }}'
+                            sequence:
+                            - if:
+                                - condition: template
+                                  value_template: "{{ on_if_on_enabled }}"
+                                - condition: state
+                                  entity_id: !input on_if_on_light
+                                  state: "on"
+                              then: !input on_if_on_action
+                              else: !input on_click_action
+                        default:
+                          - wait_for_trigger:
+                              - platform: event
+                                event_type: zha_event
+                                event_data:
+                                  device_id: "{{ zha_remote }}"
+                                  command: "on"
+                                  cluster_id: 6
+                                  endpoint_id: 1
+                            timeout:
+                              milliseconds: !input helper_double_click_delay
+                            continue_on_timeout: true
+                          # double click
+                          - choose:
+                              - conditions:
+                                  - condition: template
+                                    value_template: '{{ wait.trigger == none }}'
+                                sequence:
+                                  - service: !input on_double_click_action
+                            default:
+                              - service: !input on_double_click_action
+
+
+#                      - if:
+#                          - condition: template
+#                            value_template: "{{ wait.trigger.idx is defined }}"
+#                        then: !input on_double_click_action
+#                        else:
+#                          - if:
+#                              - condition: template
+#                                value_template: "{{ on_if_on_enabled }}"
+#                              - condition: state
+#                                entity_id: !input on_if_on_light
+#                                state: "on"
+#                            then: !input on_if_on_action
+#                            else: !input on_click_action
             else:
               - if:
                   - condition: template
