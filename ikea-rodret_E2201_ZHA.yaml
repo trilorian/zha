@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.35)
+  description: "## IKEA RODRET Dimmer remote (v1.36)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -228,8 +228,13 @@ action:
                           - click-on-zha
                     sequence:
                       - wait_for_trigger:
-                        - id:
-                          - click-on-zha
+                          - platform: event
+                            event_type: zha_event
+                            event_data:
+                              device_id: "{{ zha_remote }}"
+                              command: "on"
+                              cluster_id: 6
+                              endpoint_id: 1
                         timeout:
                           milliseconds: !input helper_double_click_delay
                         continue_on_timeout: true
@@ -271,8 +276,13 @@ action:
                           - click-off-zha
                     sequence:
                       - wait_for_trigger:
-                          - id:
-                            - click-off-zha
+                          - platform: event
+                            event_type: zha_event
+                            event_data:
+                              device_id: "{{ zha_remote }}"
+                              command: "off"
+                              cluster_id: 6
+                              endpoint_id: 1
                         timeout:
                           milliseconds: !input helper_double_click_delay
                         continue_on_timeout: true
@@ -302,8 +312,13 @@ action:
                                     - hold-on-zha
                               sequence:
                                 - wait_for_trigger:
-                                  - id:
-                                    - release-zha
+                                  - platform: event
+                                    event_type: zha_event
+                                    event_data:
+                                      device_id: "{{ zha_remote }}"
+                                      command: "stop_with_on_off"
+                                      cluster_id: 8
+                                      endpoint_id: 1
                                   timeout:
                                     milliseconds: !input helper_hold_delay
                                   continue_on_timeout: true
@@ -332,8 +347,13 @@ action:
                                     - hold-off-zha
                               sequence:
                                 - wait_for_trigger:
-                                  - id:
-                                    - release-zha
+                                    - platform: event
+                                      event_type: zha_event
+                                      event_data:
+                                        device_id: "{{ zha_remote }}"
+                                        command: "stop_with_on_off"
+                                        cluster_id: 8
+                                        endpoint_id: 1
                                   timeout:
                                     milliseconds: !input helper_hold_delay
                                   continue_on_timeout: true
