@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.24)
+  description: "## IKEA RODRET Dimmer remote (v1.25)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -10,11 +10,12 @@ blueprint:
 
     - Click the **on** or **off** buttons
 
-    - Double click the **on** or **off** buttons (optional) in **Helper - Double click delay** interval. When disabled, there will be no delay for the simple click actions
-
-    - Click and hold the **on**/**off** buttons. Actions will be executed every **Helper - Hold delay**, but maximum **Helper - Max number of loops** times.
+    - Click and hold the **on**/**off** buttons. Actions will be executed every **Helper - Hold delay**, 
+      but maximum **Helper - Max number of loops** times.
     
-    - Click the **on** button if the light is already on. Cannot be turned off yet.
+    - Double click the **on** or **off** buttons (optional) in **Helper - Double click delay** interval. 
+    
+    - Click the **on** button if the light is already on (optional). 
     "
   source_url: https://gist.github.com/trilorian/ee957a682ab6a3765e8fbb19502e9bfb
   domain: automation
@@ -54,12 +55,10 @@ blueprint:
       default: []
       selector:
         action: {}
-    on_double_click:
+    on_double_click_enabled:
       name: On - Double click event
       description:
-        Choose whether or not to expose the virtual **double click** event
-        for the **on** button. Turn this on if you are providing an action for the **on**
-        button double click event.
+        Choose whether or not to turn on the **double click** event for the **on** button.
       default: false
       selector:
         boolean: {}
@@ -71,12 +70,10 @@ blueprint:
       default: []
       selector:
         action: {}
-    off_double_click:
+    off_double_click_enabled:
       name: Off - Double click event
       description:
-        Choose whether or not to expose the virtual **double click** event
-        for the **off** button. Turn this on if you are providing an action for the **off**
-        button double click event.
+        Choose whether or not to turn on the **double click** event for the **off** button.
       default: false
       selector:
         boolean: {}
@@ -88,18 +85,18 @@ blueprint:
       default: []
       selector:
         action: {}
-    on_if_on:
-      name: On if on
+    on_if_on_enabled:
+      name: On if on event
       description:
         Choose if the on action should be overridden, if the chosen device is already on. 
-        Turn this on if you are providing an action for the **on if on** event.
       default: false
       selector:
         boolean: {}
     on_if_on_light:
       name: On if on light
       description:
-        If the on event is overriden, choose the light for which to test the state.
+        If the on event is overriden, choose the light for which to test the state. 
+        **On if on event** must be exposed.
       selector:
         entity:
           filter:
@@ -115,10 +112,8 @@ blueprint:
     helper_double_click_delay:
       name: Helper - Double click delay
       description:
-        Max delay between the first and the second button click for the
-        **Double click events**. Provide a value only if you are using a double click action.
-        Increase this value if you notice that the double click action is not triggered
-        properly.
+        Max delay between the first and the second button click for the **Double click events**. 
+        Change this value if you notice that the double click action is not triggered properly.
       default: 250
       selector:
         number:
@@ -197,8 +192,9 @@ trigger:
     id: release-zha
 action:
   - variables:
-      on_double_click: !input on_double_click
-      off_double_click: !input off_double_click
+      on_double_click_enabled: !input on_double_click_enabled
+      on_if_on_enabled: !input on_if_on_enabled
+      off_double_click_enabled: !input off_double_click_enabled
       zha_remote: !input remote_device
   - choose:
       - conditions:
@@ -208,7 +204,7 @@ action:
         sequence:
           - if:
               - condition: template
-                value_template: "{{ on_double_click }}"
+                value_template: "{{ on_double_click_enabled }}"
             then:
               - choose:
                   - conditions:
@@ -233,6 +229,8 @@ action:
                         then: !input on_double_click_action
                         else:
                           - if:
+                              - condition: template
+                                value_template: "{{ on_if_on_enabled }}"
                               - condition: state
                                 entity_id: !input on_if_on_light
                                 state: "on"
@@ -240,6 +238,8 @@ action:
                             else: !input on_click_action
             else:
               - if:
+                  - condition: template
+                    value_template: "{{ on_if_on_enabled }}"
                   - condition: state
                     entity_id: !input on_if_on_light
                     state: "on"
@@ -252,7 +252,7 @@ action:
         sequence:
           - if:
               - condition: template
-                value_template: "{{ off_double_click }}"
+                value_template: "{{ off_double_click_enabled }}"
             then:
               - choose:
                   - conditions:
