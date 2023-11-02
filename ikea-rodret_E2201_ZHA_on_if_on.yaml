@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.22)
+  description: "## IKEA RODRET Dimmer remote (v1.23)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -8,13 +8,13 @@ blueprint:
 
     Available controls:
 
-    - Press the **on** or **off** buttons
+    - Click the **on** or **off** buttons
 
-    - Double press the **on** or **off** buttons (optional) in **Helper - Double press delay** interval. When disabled, there will be no delay for the simple press actions
+    - Double click the **on** or **off** buttons (optional) in **Helper - Double click delay** interval. When disabled, there will be no delay for the simple click actions
 
-    - Press and hold the **on**/**off** buttons. Actions will be executed every **Helper - Hold delay**, but maximum **Helper - Max number of loops** times.
+    - Click and hold the **on**/**off** buttons. Actions will be executed every **Helper - Hold delay**, but maximum **Helper - Max number of loops** times.
     
-    - Press the **on** button if the light is already on. Cannot be turned off yet.
+    - Click the **on** button if the light is already on. Cannot be turned off yet.
     "
   source_url: https://gist.github.com/trilorian/ee957a682ab6a3765e8fbb19502e9bfb
   domain: automation
@@ -30,61 +30,61 @@ blueprint:
             manufacturer: IKEA of Sweden
             model: RODRET Dimmer
           multiple: false
-    on_press_action:
-      name: On - Single press action
-      description: Choose action(s) to run when **on** button is pressed.
+    on_click_action:
+      name: On - Single click action
+      description: Choose action(s) to run when **on** button is clicked.
       default: []
       selector:
         action: {}
-    off_press_action:
-      name: Off - Single press action
-      description: Choose action(s) to run when **off** button is **pressed**.
+    off_click_action:
+      name: Off - Single click action
+      description: Choose action(s) to run when **off** button is **clicked**.
       default: []
       selector:
         action: {}
     on_hold_action:
       name: On - Hold action
-      description: Choose action(s) to run when **on** button is **pressed and hold**.
+      description: Choose action(s) to run when **on** button is **clicked and held**.
       default: []
       selector:
         action: {}
     off_hold_action:
       name: Off - Hold action
-      description: Choose action(s) to run when **off** button is **pressed and hold**.
+      description: Choose action(s) to run when **off** button is **clicked and held**.
       default: []
       selector:
         action: {}
-    on_double_press:
-      name: On - Double press event
+    on_double_click:
+      name: On - Double click event
       description:
-        Choose whether or not to expose the virtual **double press** event
+        Choose whether or not to expose the virtual **double click** event
         for the **on** button. Turn this on if you are providing an action for the **on**
-        button double press event.
+        button double click event.
       default: false
       selector:
         boolean: {}
-    on_double_press_action:
-      name: On - Double press action
+    on_double_click_action:
+      name: On - Double click action
       description:
-        Choose action(s) to run when pressing the **on** button twice in **Helper - Double press
-        delay** interval. **On - Double press event** must be exposed.
+        Choose action(s) to run when clicking the **on** button twice in **Helper - Double click
+        delay** interval. **On - Double click event** must be exposed.
       default: []
       selector:
         action: {}
-    off_double_press:
-      name: Off - Double press event
+    off_double_click:
+      name: Off - Double click event
       description:
-        Choose whether or not to expose the virtual **double press** event
+        Choose whether or not to expose the virtual **double click** event
         for the **off** button. Turn this on if you are providing an action for the **off**
-        button double press event.
+        button double click event.
       default: false
       selector:
         boolean: {}
-    off_double_press_action:
-      name: Off - Double press action
+    off_double_click_action:
+      name: Off - Double click action
       description:
-        Choose action(s) to run when pressing the **off** button twice in **Helper - Double press
-        delay** interval. **Off - Double press event** must be exposed.
+        Choose action(s) to run when clicking the **off** button twice in **Helper - Double click
+        delay** interval. **Off - Double click event** must be exposed.
       default: []
       selector:
         action: {}
@@ -112,12 +112,12 @@ blueprint:
       default: []
       selector:
         action: {}
-    helper_double_press_delay:
-      name: Helper - Double press delay
+    helper_double_click_delay:
+      name: Helper - Double click delay
       description:
-        Max delay between the first and the second button press for the
-        **Double press events**. Provide a value only if you are using a double press action.
-        Increase this value if you notice that the double press action is not triggered
+        Max delay between the first and the second button click for the
+        **Double click events**. Provide a value only if you are using a double click action.
+        Increase this value if you notice that the double click action is not triggered
         properly.
       default: 250
       selector:
@@ -197,8 +197,8 @@ trigger:
     id: release-zha
 action:
   - variables:
-      on_double_press: !input on_double_press
-      off_double_press: !input off_double_press
+      on_double_click: !input on_double_click
+      off_double_click: !input off_double_click
       zha_remote: !input remote_device
   - choose:
       - conditions:
@@ -206,15 +206,9 @@ action:
             id:
               - press-on-zha
         sequence:
-#          - if:
-#              - condition: state
-#                entity_id: !input on_if_on_light
-#                state: "on"
-#            then: !input on_if_on_action
-#            else: !input on_press_action
           - if:
               - condition: template
-                value_template: "{{ on_double_press }}"
+                value_template: "{{ on_double_click }}"
             then:
               - choose:
                   - conditions:
@@ -231,28 +225,26 @@ action:
                               cluster_id: 6
                               endpoint_id: 1
                         timeout:
-                          milliseconds: !input helper_double_press_delay
+                          milliseconds: !input helper_double_click_delay
                         continue_on_timeout: true
                       - if:
                           - condition: template
                             value_template: "{{ wait.trigger.idx is defined }}"
-                        then: !input on_double_press_action
-#                        else: !input on_press_action
+                        then: !input on_double_click_action
                         else:
                           - if:
                               - condition: state
                                 entity_id: !input on_if_on_light
                                 state: "on"
                             then: !input on_if_on_action
-                            else: !input on_press_action
-#            else: !input on_press_action
+                            else: !input on_click_action
             else:
               - if:
                   - condition: state
                     entity_id: !input on_if_on_light
                     state: "on"
                 then: !input on_if_on_action
-                else: !input on_press_action
+                else: !input on_click_action
       - conditions:
           - condition: trigger
             id:
@@ -260,7 +252,7 @@ action:
         sequence:
           - if:
               - condition: template
-                value_template: "{{ off_double_press }}"
+                value_template: "{{ off_double_click }}"
             then:
               - choose:
                   - conditions:
@@ -277,14 +269,14 @@ action:
                               cluster_id: 6
                               endpoint_id: 1
                         timeout:
-                          milliseconds: !input helper_double_press_delay
+                          milliseconds: !input helper_double_click_delay
                         continue_on_timeout: true
                       - if:
                           - condition: template
                             value_template: "{{ wait.trigger.idx is defined }}"
-                        then: !input off_double_press_action
-                        else: !input off_press_action
-            else: !input off_press_action
+                        then: !input off_double_click_action
+                        else: !input off_click_action
+            else: !input off_click_action
       - conditions:
           - condition: trigger
             id:
