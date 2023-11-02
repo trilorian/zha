@@ -334,6 +334,7 @@ action:
                                         value_template: "{{ wait.trigger.idx is defined }}"
                                     then:
                                       - stop: button released
+            else: !input on_click_action
       - conditions:
           - condition: trigger
             id:
@@ -371,3 +372,4 @@ action:
                                         value_template: "{{ wait.trigger.idx is defined }}"
                                     then:
                                       - stop: button released
+            else: !input on_click_action
