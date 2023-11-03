@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.50)
+  description: "## IKEA RODRET Dimmer remote (v1.51)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -184,7 +184,7 @@ blueprint:
           max: 1000.0
           step: 1.0
           mode: slider
-mode: single
+mode: restart
 max_exceeded: silent
 trigger_variables:
   zha_remote: !input remote_device
