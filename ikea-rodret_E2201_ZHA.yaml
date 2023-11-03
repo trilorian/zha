@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.71)
+  description: "## IKEA RODRET Dimmer remote (v1.72)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -239,65 +239,71 @@ trigger:
       endpoint_id: 1
     id: release-zha
 action:
-  - wait_for_trigger:
-      - platform: event
-        event_type: zha_event
-        event_data:
-          device_id: "{{ zha_remote }}"
-          command: "on"
-          cluster_id: 6
-          endpoint_id: 1
-    timeout:
-      milliseconds: !input helper_multi_click_delay
-    continue_on_timeout: true
   - choose:
       - conditions:
-          - condition: template
-            value_template: '{{ wait.trigger == none }}'
+          - condition: trigger
+            id:
+              - click-on-zha
         sequence:
+          - wait_for_trigger:
+              - platform: event
+                event_type: zha_event
+                event_data:
+                  device_id: "{{ zha_remote }}"
+                  command: "on"
+                  cluster_id: 6
+                  endpoint_id: 1
+            timeout:
+              milliseconds: !input helper_multi_click_delay
+            continue_on_timeout: true
           - choose:
               - conditions:
-                  # Single click, check if on_if_on_enabled
                   - condition: template
-                    value_template: "{{ on_if_on_enabled }}"
-                  - condition: state
-                    entity_id: !input on_if_on_light
-                    state: "on"
-                sequence: !input on_if_on_action
-            default: !input on_click_action
-    default:
-      - wait_for_trigger:
-          - platform: event
-            event_type: zha_event
-            event_data:
-              device_id: "{{ zha_remote }}"
-              command: "on"
-              cluster_id: 6
-              endpoint_id: 1
-        timeout:
-          milliseconds: !input helper_multi_click_delay
-        continue_on_timeout: true
-      - choose:
-          - conditions:
-              - condition: template
-                value_template: '{{ wait.trigger == none }}'
-            sequence:
+                    value_template: '{{ wait.trigger == none }}'
+                sequence:
+                  - choose:
+                      - conditions:
+                          # Single click, check if on_if_on_enabled
+                          - condition: template
+                            value_template: "{{ on_if_on_enabled }}"
+                          - condition: state
+                            entity_id: !input on_if_on_light
+                            state: "on"
+                        sequence: !input on_if_on_action
+                    default: !input on_click_action
+            default:
+              - wait_for_trigger:
+                  - platform: event
+                    event_type: zha_event
+                    event_data:
+                      device_id: "{{ zha_remote }}"
+                      command: "on"
+                      cluster_id: 6
+                      endpoint_id: 1
+                timeout:
+                  milliseconds: !input helper_multi_click_delay
+                continue_on_timeout: true
               - choose:
                   - conditions:
-                      # Double click, check if on_double_click_enabled
                       - condition: template
-                        value_template: "{{ on_double_click_enabled }}"
-                    sequence: !input on_double_click_action
-                default: !input on_click_action
-        default:
-          - choose:
-              - conditions:
-                  # Triple click, check if on_triple_click_enabled
-                  - condition: template
-                    value_template: "{{ on_triple_click_enabled }}"
-                sequence: !input on_triple_click_action
-            default: !input on_click_action
-#action:
+                        value_template: '{{ wait.trigger == none }}'
+                    sequence:
+                      - choose:
+                          - conditions:
+                              # Double click, check if on_double_click_enabled
+                              - condition: template
+                                value_template: "{{ on_double_click_enabled }}"
+                            sequence: !input on_double_click_action
+                        default: !input on_click_action
+                default:
+                  - choose:
+                      - conditions:
+                          # Triple click, check if on_triple_click_enabled
+                          - condition: template
+                            value_template: "{{ on_triple_click_enabled }}"
+                        sequence: !input on_triple_click_action
+                    default: !input on_click_action
+# action:
 #  - variables:
 #      on_double_click_enabled: !input on_double_click_enabled
 #      off_double_click_enabled: !input off_double_click_enabled
