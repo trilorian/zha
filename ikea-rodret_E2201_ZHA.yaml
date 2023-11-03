@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.61)
+  description: "## IKEA RODRET Dimmer remote (v1.62)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -184,7 +184,9 @@ blueprint:
           max: 1000.0
           step: 1.0
           mode: slider
-mode: single
+initial_state: true
+# Force restart to pickup double click
+mode: restart
 max_exceeded: silent
 trigger_variables:
   zha_remote: !input remote_device
@@ -232,12 +234,14 @@ trigger:
       endpoint_id: 1
     id: release-zha
 action:
-  # Increment the counter then delay 0.5 second to allow for a second click to cancel the second action.
+  # Increment the counter then delay helper_multi_click_delay ms to allow for a second click to cancel the second action
   - service: counter.increment
     entity_id: counter.zha_button_click
   - delay:
       milliseconds: !input helper_multi_click_delay
+
   - variables:
+      # Store the click count
       click_count: '{{ states("counter.zha_button_click") }}'
       on_hold_enabled: !input on_hold_enabled
       off_hold_enabled: !input off_hold_enabled
@@ -246,6 +250,11 @@ action:
       on_triple_click_enabled: !input on_triple_click_enabled
       off_double_click_enabled: !input off_double_click_enabled
       off_triple_click_enabled: !input off_triple_click_enabled
+
+  # Reset the counter
+  - service: counter.reset
+    entity_id: counter.zha_button_click
+
   - choose:
       - conditions:
           - condition: trigger
@@ -365,7 +374,7 @@ action:
                         sequence: !input off_triple_click_action
                     default: !input off_click_action
 
-#action:
+# action:
 #  - variables:
 #      on_double_click_enabled: !input on_double_click_enabled
 #      off_double_click_enabled: !input off_double_click_enabled
