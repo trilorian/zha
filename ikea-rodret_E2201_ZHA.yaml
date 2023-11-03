@@ -1,6 +1,7 @@
+---
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.57)
+  description: "## IKEA RODRET Dimmer remote (v1.58)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -234,14 +235,14 @@ trigger:
     id: release-zha
 action:
   # Increment the counter then delay helper_multi_click_delay ms to allow for a second click to cancel the second action
-  - service: counter.increment
-    entity_id: counter.zha_button_click
-  - delay:
-      milliseconds: !input helper_multi_click_delay
+#  - service: counter.increment
+#    entity_id: counter.zha_button_click
+#  - delay:
+#      milliseconds: !input helper_multi_click_delay
 
   # Set variables and store the click count
   - variables:
-      click_count: '{{ states("counter.zha_button_click") }}'
+#      click_count: '{{ states("counter.zha_button_click") }}'
       on_hold_enabled: !input on_hold_enabled
       off_hold_enabled: !input off_hold_enabled
       on_if_on_enabled: !input on_if_on_enabled
@@ -251,8 +252,8 @@ action:
       off_triple_click_enabled: !input off_triple_click_enabled
 
   # Reset the counter.
-  - service: counter.reset
-    entity_id: counter.zha_button_click
+#  - service: counter.reset
+#    entity_id: counter.zha_button_click
 
   # Take action based on the counter
   - choose:
