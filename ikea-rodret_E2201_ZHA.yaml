@@ -272,6 +272,7 @@ action:
                     entity_id: !input on_if_on_light
                     state: "on"
                 sequence: !input on_if_on_action
+            # Default
             default: !input on_click_action
       - conditions:
           - condition: trigger
