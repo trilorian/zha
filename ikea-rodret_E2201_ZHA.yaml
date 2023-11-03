@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.76)
+  description: "## IKEA RODRET Dimmer remote (v1.77)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -322,3 +322,73 @@ action:
                             value_template: "{{ off_triple_click_enabled }}"
                         sequence: !input off_triple_click_action
                     default: !input off_click_action
+      - conditions:
+          - condition: trigger
+            id:
+              - hold-on-zha
+          - condition: template
+            value_template: "{{ on_hold_enabled }}"
+        sequence:
+          - repeat:
+              count: !input helper_max_loops
+              sequence:
+                - parallel:
+                    - sequence: !input on_hold_action
+                    - sequence:
+                        - choose:
+                            - conditions:
+                                - condition: trigger
+                                  id:
+                                    - hold-on-zha
+                              sequence:
+                                - wait_for_trigger:
+                                    - platform: event
+                                      event_type: zha_event
+                                      event_data:
+                                        device_id: "{{ zha_remote }}"
+                                        command: "stop_with_on_off"
+                                        cluster_id: 8
+                                        endpoint_id: 1
+                                  timeout:
+                                    milliseconds: !input helper_hold_delay
+                                  continue_on_timeout: true
+                                - if:
+                                    - condition: template
+                                      value_template: "{{ wait.trigger.idx is defined }}"
+                                  then:
+                                    - stop: button released
+      - conditions:
+          - condition: trigger
+            id:
+              - hold-off-zha
+          - condition: template
+            value_template: "{{ off_hold_enabled }}"
+        sequence:
+          - repeat:
+              count: !input helper_max_loops
+              sequence:
+                - parallel:
+                    - sequence: !input off_hold_action
+                    - sequence:
+                        - choose:
+                            - conditions:
+                                - condition: trigger
+                                  id:
+                                    - hold-off-zha
+                              sequence:
+                                - wait_for_trigger:
+                                    - platform: event
+                                      event_type: zha_event
+                                      event_data:
+                                        device_id: "{{ zha_remote }}"
+                                        command: "stop_with_on_off"
+                                        cluster_id: 8
+                                        endpoint_id: 1
+                                  timeout:
+                                    milliseconds: !input helper_hold_delay
+                                  continue_on_timeout: true
+                                - if:
+                                    - condition: template
+                                      value_template: "{{ wait.trigger.idx is defined }}"
+                                  then:
+                                    - stop: button released
