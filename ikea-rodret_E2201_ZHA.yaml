@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.73)
+  description: "## IKEA RODRET Dimmer remote (v1.74)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -324,17 +324,7 @@ action:
               - conditions:
                   - condition: template
                     value_template: '{{ wait.trigger == none }}'
-                sequence:
-                  - choose:
-                      - conditions:
-                          # Single click, check if on_if_on_enabled
-                          - condition: template
-                            value_template: "{{ on_if_on_enabled }}"
-                          - condition: state
-                            entity_id: !input on_if_on_light
-                            state: "on"
-                        sequence: !input on_if_on_action
-                    default: !input off_click_action
+                sequence: !input off_click_action
             default:
               - wait_for_trigger:
                   - platform: event
