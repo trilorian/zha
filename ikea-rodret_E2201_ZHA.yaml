@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.48)
+  description: "## IKEA RODRET Dimmer remote (v1.49)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -304,55 +304,60 @@ action:
                             value_template: "{{ on_triple_click_enabled }}"
                         sequence: !input on_triple_click_action
                     default: !input on_click_action
-#  - wait_for_trigger:
-#    - platform: event
-#      event_type: zha_event
-#      event_data:
-#        device_id: "{{ zha_remote }}"
-#        command: "off"
-#        cluster_id: 6
-#        endpoint_id: 1
-#    timeout:
-#      milliseconds: !input helper_multi_click_delay
-#    continue_on_timeout: true
-#  - choose:
-#      - conditions:
-#          - condition: template
-#            value_template: '{{ wait.trigger == none }}'
-#        # OFF - Single click
-#        sequence: !input off_click_action
-#    default:
-#      - wait_for_trigger:
-#        - platform: event
-#          event_type: zha_event
-#          event_data:
-#            device_id: "{{ zha_remote }}"
-#            command: "off"
-#            cluster_id: 6
-#            endpoint_id: 1
-#        timeout:
-#          milliseconds: !input helper_multi_click_delay
-#        continue_on_timeout: true
-#      - choose:
-#          - conditions:
-#              - condition: template
-#                value_template: '{{ wait.trigger == none }}'
-#            sequence:
-#              - choose:
-#                  - conditions:
-#                      # OFF Double click, check if off_double_click_enabled
-#                      - condition: template
-#                        value_template: "{{ off_double_click_enabled }}"
-#                    sequence: !input off_double_click_action
-#                default: !input off_click_action
-#        default:
-#          - choose:
-#              - conditions:
-#                  # OFF - Triple click, check if off_triple_click_enabled
-#                  - condition: template
-#                    value_template: "{{ off_triple_click_enabled }}"
-#                sequence: !input off_triple_click_action
-#            default: !input off_click_action
+      - conditions:
+          - condition: trigger
+            id:
+              - click-off-zha
+        sequence:
+          - wait_for_trigger:
+            - platform: event
+              event_type: zha_event
+              event_data:
+                device_id: "{{ zha_remote }}"
+                command: "off"
+                cluster_id: 6
+                endpoint_id: 1
+            timeout:
+              milliseconds: !input helper_multi_click_delay
+            continue_on_timeout: true
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: '{{ wait.trigger == none }}'
+                # OFF - Single click
+                sequence: !input off_click_action
+            default:
+              - wait_for_trigger:
+                - platform: event
+                  event_type: zha_event
+                  event_data:
+                    device_id: "{{ zha_remote }}"
+                    command: "off"
+                    cluster_id: 6
+                    endpoint_id: 1
+                timeout:
+                  milliseconds: !input helper_multi_click_delay
+                continue_on_timeout: true
+              - choose:
+                  - conditions:
+                      - condition: template
+                        value_template: '{{ wait.trigger == none }}'
+                    sequence:
+                      - choose:
+                          - conditions:
+                              # OFF Double click, check if off_double_click_enabled
+                              - condition: template
+                                value_template: "{{ off_double_click_enabled }}"
+                            sequence: !input off_double_click_action
+                        default: !input off_click_action
+                default:
+                  - choose:
+                      - conditions:
+                          # OFF - Triple click, check if off_triple_click_enabled
+                          - condition: template
+                            value_template: "{{ off_triple_click_enabled }}"
+                        sequence: !input off_triple_click_action
+                    default: !input off_click_action
 
 #action:
 #  - variables:
