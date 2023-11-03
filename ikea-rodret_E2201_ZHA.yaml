@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.54)
+  description: "## IKEA RODRET Dimmer remote (v1.55)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -260,36 +260,36 @@ action:
             id:
               - click-on-zha
             sequence:
-                - choose:
-                  # ON - Single Click
-                  - conditions: '{{ click_count == 1 }}'
-                    sequence:
-                      - choose:
-                          - conditions:
-                              # ON - Single click, check if on_if_on_enabled
-                              - condition: template
-                                value_template: "{{ on_if_on_enabled }}"
-                              - condition: state
-                                entity_id: !input on_if_on_light
-                                state: "on"
-                            sequence: !input on_if_on_action
-                        default: !input on_click_action
-                  # ON - Double click
-                  - conditions: '{{ click_count == 2 }}'
-                    sequence:
-                      - choose:
-                          - conditions:
-                              # ON - Double click, check if on_double_click_enabled
-                              - condition: template
-                                value_template: "{{ on_double_click_enabled }}"
-                            sequence: !input on_double_click_action
-                        default: !input on_click_action
-                  # ON - Triple click
-                  - conditions: '{{ click_count == 3 }}'
-                    sequence:
-                      - choose:
-                          - conditions:
-                              # ON - Triple click, check if on_triple_click_enabled
-                              - condition: template
-                                value_template: "{{ on_triple_click_enabled }}"
-                            sequence: !input on_triple_click_action
+              - choose:
+                # ON - Single Click
+                - conditions: '{{ click_count == 1 }}'
+                  sequence:
+                    - choose:
+                        - conditions:
+                            # ON - Single click, check if on_if_on_enabled
+                            - condition: template
+                              value_template: "{{ on_if_on_enabled }}"
+                            - condition: state
+                              entity_id: !input on_if_on_light
+                              state: "on"
+                          sequence: !input on_if_on_action
+                      default: !input on_click_action
+                # ON - Double click
+                - conditions: '{{ click_count == 2 }}'
+                  sequence:
+                    - choose:
+                        - conditions:
+                            # ON - Double click, check if on_double_click_enabled
+                            - condition: template
+                              value_template: "{{ on_double_click_enabled }}"
+                          sequence: !input on_double_click_action
+                      default: !input on_click_action
+                # ON - Triple click
+                - conditions: '{{ click_count == 3 }}'
+                  sequence:
+                    - choose:
+                        - conditions:
+                            # ON - Triple click, check if on_triple_click_enabled
+                            - condition: template
+                              value_template: "{{ on_triple_click_enabled }}"
+                          sequence: !input on_triple_click_action
