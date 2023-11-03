@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.59)
+  description: "## IKEA RODRET Dimmer remote (v1.60)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -10,12 +10,12 @@ blueprint:
 
     - Click the **on** or **off** buttons
 
-    - Click and hold the **on**/**off** buttons (optional). Actions will be executed every **Helper - Hold delay**, 
+    - Click and hold the **on**/**off** buttons (optional). Actions will be executed every **Helper - Hold delay**,
       but maximum **Helper - Max number of loops** times.
-    
-    - Double click the **on** or **off** buttons (optional) in **Helper - Multi click delay** interval. 
-    
-    - Click the **on** button if the light is already on (optional). 
+
+    - Double click the **on** or **off** buttons (optional) in **Helper - Multi click delay** interval.
+
+    - Click the **on** button if the light is already on (optional).
     "
   source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
   domain: automation
@@ -247,13 +247,13 @@ action:
               - click-on-zha
         sequence:
           - wait_for_trigger:
-            - platform: event
-              event_type: zha_event
-              event_data:
-                device_id: "{{ zha_remote }}"
-                command: "on"
-                cluster_id: 6
-                endpoint_id: 1
+              - platform: event
+                event_type: zha_event
+                event_data:
+                  device_id: "{{ zha_remote }}"
+                  command: "on"
+                  cluster_id: 6
+                  endpoint_id: 1
             timeout:
               milliseconds: !input helper_multi_click_delay
             continue_on_timeout: true
@@ -274,13 +274,13 @@ action:
                     default: !input on_click_action
             default:
               - wait_for_trigger:
-                - platform: event
-                  event_type: zha_event
-                  event_data:
-                    device_id: "{{ zha_remote }}"
-                    command: "on"
-                    cluster_id: 6
-                    endpoint_id: 1
+                  - platform: event
+                    event_type: zha_event
+                    event_data:
+                      device_id: "{{ zha_remote }}"
+                      command: "on"
+                      cluster_id: 6
+                      endpoint_id: 1
                 timeout:
                   milliseconds: !input helper_multi_click_delay
                 continue_on_timeout: true
@@ -310,13 +310,13 @@ action:
               - click-off-zha
         sequence:
           - wait_for_trigger:
-            - platform: event
-              event_type: zha_event
-              event_data:
-                device_id: "{{ zha_remote }}"
-                command: "off"
-                cluster_id: 6
-                endpoint_id: 1
+              - platform: event
+                event_type: zha_event
+                event_data:
+                  device_id: "{{ zha_remote }}"
+                  command: "off"
+                  cluster_id: 6
+                  endpoint_id: 1
             timeout:
               milliseconds: !input helper_multi_click_delay
             continue_on_timeout: true
@@ -328,13 +328,13 @@ action:
                 sequence: !input off_click_action
             default:
               - wait_for_trigger:
-                - platform: event
-                  event_type: zha_event
-                  event_data:
-                    device_id: "{{ zha_remote }}"
-                    command: "off"
-                    cluster_id: 6
-                    endpoint_id: 1
+                  - platform: event
+                    event_type: zha_event
+                    event_data:
+                      device_id: "{{ zha_remote }}"
+                      command: "off"
+                      cluster_id: 6
+                      endpoint_id: 1
                 timeout:
                   milliseconds: !input helper_multi_click_delay
                 continue_on_timeout: true
