@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.52)
+  description: "## IKEA RODRET Dimmer remote (v1.53)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -237,7 +237,7 @@ action:
   - service: counter.increment
     entity_id: counter.zha_button_click
   - delay:
-      milliseconds: !input helper_double_click_delay
+      milliseconds: !input helper_multi_click_delay
 
   # Store the click count and reset the counter.
   - variables:
