@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.74)
+  description: "## IKEA RODRET Dimmer remote (v1.75)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -15,7 +15,7 @@ blueprint:
 
     - Double click the **on** or **off** buttons (optional) in **Helper - Multi click delay** interval.
 
-    - Click the **on** button if the light is already on (optional).
+    - Triple click the **on** or **off** buttons (optional) in **Helper - Multi click delay** interval.
     "
   source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
   domain: automation
@@ -127,30 +127,6 @@ blueprint:
       default: []
       selector:
         action: {}
-    on_if_on_enabled:
-      name: On - if on event
-      description:
-        Choose if the on action should be overridden, if the chosen device is already on.
-      default: false
-      selector:
-        boolean: {}
-    on_if_on_light:
-      name: On if on light
-      description:
-        If the on event is overriden, choose the light for which to test the state. **On - if on event** must be exposed.
-      selector:
-        entity:
-          filter:
-            domain: light
-          multiple: false
-      default: []
-    on_if_on_action:
-      name: On if on action
-      description:
-        Choose action(s) to run when clicking the **on** button again (if a device is chosen and it is already on).
-      default: []
-      selector:
-        action: {}
     helper_multi_click_delay:
       name: Helper - Multi click delay
       description:
@@ -189,7 +165,6 @@ max_exceeded: silent
 trigger_variables:
   on_hold_enabled: !input on_hold_enabled
   off_hold_enabled: !input off_hold_enabled
-  on_if_on_enabled: !input on_if_on_enabled
   on_double_click_enabled: !input on_double_click_enabled
   on_triple_click_enabled: !input on_triple_click_enabled
   off_double_click_enabled: !input off_double_click_enabled
@@ -260,17 +235,7 @@ action:
               - conditions:
                   - condition: template
                     value_template: '{{ wait.trigger == none }}'
-                sequence:
-                  - choose:
-                      - conditions:
-                          # Single click, check if on_if_on_enabled
-                          - condition: template
-                            value_template: "{{ on_if_on_enabled }}"
-                          - condition: state
-                            entity_id: !input on_if_on_light
-                            state: "on"
-                        sequence: !input on_if_on_action
-                    default: !input on_click_action
+                sequence: !input on_click_action
             default:
               - wait_for_trigger:
                   - platform: event
