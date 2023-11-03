@@ -1,7 +1,6 @@
----
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.58)
+  description: "## IKEA RODRET Dimmer remote (v1.59)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -185,8 +184,7 @@ blueprint:
           max: 1000.0
           step: 1.0
           mode: slider
-initial_state: true
-mode: restart
+mode: single
 max_exceeded: silent
 trigger_variables:
   zha_remote: !input remote_device
@@ -234,15 +232,7 @@ trigger:
       endpoint_id: 1
     id: release-zha
 action:
-  # Increment the counter then delay helper_multi_click_delay ms to allow for a second click to cancel the second action
-#  - service: counter.increment
-#    entity_id: counter.zha_button_click
-#  - delay:
-#      milliseconds: !input helper_multi_click_delay
-
-  # Set variables and store the click count
   - variables:
-#      click_count: '{{ states("counter.zha_button_click") }}'
       on_hold_enabled: !input on_hold_enabled
       off_hold_enabled: !input off_hold_enabled
       on_if_on_enabled: !input on_if_on_enabled
@@ -250,53 +240,281 @@ action:
       on_triple_click_enabled: !input on_triple_click_enabled
       off_double_click_enabled: !input off_double_click_enabled
       off_triple_click_enabled: !input off_triple_click_enabled
-
-  # Reset the counter.
-#  - service: counter.reset
-#    entity_id: counter.zha_button_click
-
-  # Take action based on the counter
   - choose:
       - conditions:
           - condition: trigger
             id:
               - click-on-zha
-            sequence: !input on_click_action
-#              - choose:
-#                # ON - Single Click
-#                - conditions: '{{ click_count == 1 }}'
-#                  sequence:
-#                    - choose:
-#                        - conditions:
-#                            # ON - Single click, check if on_if_on_enabled
-#                            - condition: template
-#                              value_template: "{{ on_if_on_enabled }}"
-#                            - condition: state
-#                              entity_id: !input on_if_on_light
-#                              state: "on"
-#                          sequence: !input on_if_on_action
-#                      default: !input on_click_action
-#                # ON - Double click
-#                - conditions: '{{ click_count == 2 }}'
-#                  sequence:
-#                    - choose:
-#                        - conditions:
-#                            # ON - Double click, check if on_double_click_enabled
-#                            - condition: template
-#                              value_template: "{{ on_double_click_enabled }}"
-#                          sequence: !input on_double_click_action
-#                      default: !input on_click_action
-#                # ON - Triple click
-#                - conditions: '{{ click_count == 3 }}'
-#                  sequence:
-#                    - choose:
-#                        - conditions:
-#                            # ON - Triple click, check if on_triple_click_enabled
-#                            - condition: template
-#                              value_template: "{{ on_triple_click_enabled }}"
-#                          sequence: !input on_triple_click_action
+        sequence:
+          - wait_for_trigger:
+            - platform: event
+              event_type: zha_event
+              event_data:
+                device_id: "{{ zha_remote }}"
+                command: "on"
+                cluster_id: 6
+                endpoint_id: 1
+            timeout:
+              milliseconds: !input helper_multi_click_delay
+            continue_on_timeout: true
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: '{{ wait.trigger == none }}'
+                sequence:
+                  - choose:
+                      - conditions:
+                          # ON - Single click, check if on_if_on_enabled
+                          - condition: template
+                            value_template: "{{ on_if_on_enabled }}"
+                          - condition: state
+                            entity_id: !input on_if_on_light
+                            state: "on"
+                        sequence: !input on_if_on_action
+                    default: !input on_click_action
+            default:
+              - wait_for_trigger:
+                - platform: event
+                  event_type: zha_event
+                  event_data:
+                    device_id: "{{ zha_remote }}"
+                    command: "on"
+                    cluster_id: 6
+                    endpoint_id: 1
+                timeout:
+                  milliseconds: !input helper_multi_click_delay
+                continue_on_timeout: true
+              - choose:
+                  - conditions:
+                      - condition: template
+                        value_template: '{{ wait.trigger == none }}'
+                    sequence:
+                      - choose:
+                          - conditions:
+                              # ON - Double click, check if on_double_click_enabled
+                              - condition: template
+                                value_template: "{{ on_double_click_enabled }}"
+                            sequence: !input on_double_click_action
+                        default: !input on_click_action
+                default:
+                  - choose:
+                      - conditions:
+                          # ON - Triple click, check if on_triple_click_enabled
+                          - condition: template
+                            value_template: "{{ on_triple_click_enabled }}"
+                        sequence: !input on_triple_click_action
+                    default: !input on_click_action
       - conditions:
           - condition: trigger
             id:
               - click-off-zha
-        sequence: !input off_click_action
+        sequence:
+          - wait_for_trigger:
+            - platform: event
+              event_type: zha_event
+              event_data:
+                device_id: "{{ zha_remote }}"
+                command: "off"
+                cluster_id: 6
+                endpoint_id: 1
+            timeout:
+              milliseconds: !input helper_multi_click_delay
+            continue_on_timeout: true
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: '{{ wait.trigger == none }}'
+                # OFF - Single click
+                sequence: !input off_click_action
+            default:
+              - wait_for_trigger:
+                - platform: event
+                  event_type: zha_event
+                  event_data:
+                    device_id: "{{ zha_remote }}"
+                    command: "off"
+                    cluster_id: 6
+                    endpoint_id: 1
+                timeout:
+                  milliseconds: !input helper_multi_click_delay
+                continue_on_timeout: true
+              - choose:
+                  - conditions:
+                      - condition: template
+                        value_template: '{{ wait.trigger == none }}'
+                    sequence:
+                      - choose:
+                          - conditions:
+                              # OFF Double click, check if off_double_click_enabled
+                              - condition: template
+                                value_template: "{{ off_double_click_enabled }}"
+                            sequence: !input off_double_click_action
+                        default: !input off_click_action
+                default:
+                  - choose:
+                      - conditions:
+                          # OFF - Triple click, check if off_triple_click_enabled
+                          - condition: template
+                            value_template: "{{ off_triple_click_enabled }}"
+                        sequence: !input off_triple_click_action
+                    default: !input off_click_action
+
+#action:
+#  - variables:
+#      on_double_click_enabled: !input on_double_click_enabled
+#      off_double_click_enabled: !input off_double_click_enabled
+#      on_hold_enabled: !input on_hold_enabled
+#      off_hold_enabled: !input off_hold_enabled
+#      on_if_on_enabled: !input on_if_on_enabled
+#      zha_remote: !input remote_device
+#  - choose:
+#      - conditions:
+#          - condition: trigger
+#            id:
+#              - click-on-zha
+#        sequence:
+#          - if:
+#              - condition: template
+#                value_template: "{{ on_double_click_enabled }}"
+#            then:
+#              - choose:
+#                  - conditions:
+#                      - condition: trigger
+#                        id:
+#                          - click-on-zha
+#                    sequence:
+#                      - wait_for_trigger:
+#                          - platform: event
+#                            event_type: zha_event
+#                            event_data:
+#                              device_id: "{{ zha_remote }}"
+#                              command: "on"
+#                              cluster_id: 6
+#                              endpoint_id: 1
+#                        timeout:
+#                          milliseconds: !input helper_double_click_delay
+#                        continue_on_timeout: true
+#                      - if:
+#                          - condition: template
+#                            value_template: "{{ wait.trigger.idx is defined }}"
+#                        then: !input on_double_click_action
+#                        else:
+#                          - if:
+#                              - condition: template
+#                                value_template: "{{ on_if_on_enabled }}"
+#                              - condition: state
+#                                entity_id: !input on_if_on_light
+#                                state: "on"
+#                            then: !input on_if_on_action
+#                            else: !input on_click_action
+#            else:
+#              - if:
+#                  - condition: template
+#                    value_template: "{{ on_if_on_enabled }}"
+#                  - condition: state
+#                    entity_id: !input on_if_on_light
+#                    state: "on"
+#                then: !input on_if_on_action
+#                else: !input on_click_action
+#      - conditions:
+#          - condition: trigger
+#            id:
+#              - click-off-zha
+#        sequence:
+#          - if:
+#              - condition: template
+#                value_template: "{{ off_double_click_enabled }}"
+#            then:
+#              - choose:
+#                  - conditions:
+#                      - condition: trigger
+#                        id:
+#                          - click-off-zha
+#                    sequence:
+#                      - wait_for_trigger:
+#                          - platform: event
+#                            event_type: zha_event
+#                            event_data:
+#                              device_id: "{{ zha_remote }}"
+#                              command: "off"
+#                              cluster_id: 6
+#                              endpoint_id: 1
+#                        timeout:
+#                          milliseconds: !input helper_double_click_delay
+#                        continue_on_timeout: true
+#                      - if:
+#                          - condition: template
+#                            value_template: "{{ wait.trigger.idx is defined }}"
+#                        then: !input off_double_click_action
+#                        else: !input off_click_action
+#            else: !input off_click_action
+#      - conditions:
+#          - condition: trigger
+#            id:
+#              - hold-on-zha
+#          - condition: template
+#            value_template: "{{ on_hold_enabled }}"
+#        sequence:
+#          - repeat:
+#              count: !input helper_max_loops
+#              sequence:
+#                - parallel:
+#                    - sequence: !input on_hold_action
+#                    - sequence:
+#                        - choose:
+#                            - conditions:
+#                                - condition: trigger
+#                                  id:
+#                                    - hold-on-zha
+#                              sequence:
+#                                - wait_for_trigger:
+#                                  - platform: event
+#                                    event_type: zha_event
+#                                    event_data:
+#                                      device_id: "{{ zha_remote }}"
+#                                      command: "stop_with_on_off"
+#                                      cluster_id: 8
+#                                      endpoint_id: 1
+#                                  timeout:
+#                                    milliseconds: !input helper_hold_delay
+#                                  continue_on_timeout: true
+#                                - if:
+#                                    - condition: template
+#                                      value_template: "{{ wait.trigger.idx is defined }}"
+#                                  then:
+#                                    - stop: button released
+#      - conditions:
+#          - condition: trigger
+#            id:
+#              - hold-off-zha
+#          - condition: template
+#            value_template: "{{ off_hold_enabled }}"
+#        sequence:
+#          - repeat:
+#              count: !input helper_max_loops
+#              sequence:
+#                - parallel:
+#                    - sequence: !input off_hold_action
+#                    - sequence:
+#                        - choose:
+#                            - conditions:
+#                                - condition: trigger
+#                                  id:
+#                                    - hold-off-zha
+#                              sequence:
+#                                - wait_for_trigger:
+#                                    - platform: event
+#                                      event_type: zha_event
+#                                      event_data:
+#                                        device_id: "{{ zha_remote }}"
+#                                        command: "stop_with_on_off"
+#                                        cluster_id: 8
+#                                        endpoint_id: 1
+#                                  timeout:
+#                                    milliseconds: !input helper_hold_delay
+#                                  continue_on_timeout: true
+#                                - if:
+#                                    - condition: template
+#                                      value_template: "{{ wait.trigger.idx is defined }}"
+#                                  then:
+#                                    - stop: button released
