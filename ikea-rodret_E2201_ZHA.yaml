@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.63)
+  description: "## IKEA RODRET Dimmer remote (v1.64)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -262,65 +262,7 @@ action:
               - click-on-zha
           - condition: template
             value_template: '{{ click_count == 1 }}'
-        sequence:
-          - wait_for_trigger:
-              - platform: event
-                event_type: zha_event
-                event_data:
-                  device_id: "{{ zha_remote }}"
-                  command: "on"
-                  cluster_id: 6
-                  endpoint_id: 1
-            timeout:
-              milliseconds: !input helper_multi_click_delay
-            continue_on_timeout: true
-          - choose:
-              - conditions:
-                  - condition: template
-                    value_template: '{{ wait.trigger == none }}'
-                sequence:
-                  - choose:
-                      - conditions:
-                          # ON - Single click, check if on_if_on_enabled
-                          - condition: template
-                            value_template: "{{ on_if_on_enabled }}"
-                          - condition: state
-                            entity_id: !input on_if_on_light
-                            state: "on"
-                        sequence: !input on_if_on_action
-                    default: !input on_click_action
-            default:
-              - wait_for_trigger:
-                  - platform: event
-                    event_type: zha_event
-                    event_data:
-                      device_id: "{{ zha_remote }}"
-                      command: "on"
-                      cluster_id: 6
-                      endpoint_id: 1
-                timeout:
-                  milliseconds: !input helper_multi_click_delay
-                continue_on_timeout: true
-              - choose:
-                  - conditions:
-                      - condition: template
-                        value_template: '{{ wait.trigger == none }}'
-                    sequence:
-                      - choose:
-                          - conditions:
-                              # ON - Double click, check if on_double_click_enabled
-                              - condition: template
-                                value_template: "{{ on_double_click_enabled }}"
-                            sequence: !input on_double_click_action
-                        default: !input on_click_action
-                default:
-                  - choose:
-                      - conditions:
-                          # ON - Triple click, check if on_triple_click_enabled
-                          - condition: template
-                            value_template: "{{ on_triple_click_enabled }}"
-                        sequence: !input on_triple_click_action
-                    default: !input on_click_action
+        sequence: !input on_click_action
       - conditions:
           - condition: trigger
             id:
