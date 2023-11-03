@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.43)
+  description: "## IKEA RODRET Dimmer remote (v1.44)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -71,24 +71,24 @@ blueprint:
       default: []
       selector:
         action: {}
-    on_double_click_enabled:
-      name: On - Double click event
+    on_multi_click_enabled:
+      name: On - Multi click event
       description:
-        Choose whether or not to turn on the **double click** event for the **on** button.
+        Choose whether or not to turn on the **multi click** event for the **on** button.
       default: false
       selector:
         boolean: {}
     on_double_click_action:
       name: On - Double click action
       description:
-        Choose action(s) to run when clicking the **on** button twice in **Helper - Double click delay** interval. **On - Double click event** must be exposed.
+        Choose action(s) to run when clicking the **on** button twice in **Helper - Double click delay** interval. **On - Multi click event** must be exposed.
       default: []
       selector:
         action: {}
     on_triple_click_action:
-      name: On - Double click action
+      name: On - Triple click action
       description:
-        Choose action(s) to run when clicking the **on** button three times in **Helper - Double click delay** interval. **On - Double click event** must be exposed.
+        Choose action(s) to run when clicking the **on** button three times in **Helper - Double click delay** interval. **On - Multi click event** must be exposed.
       default: []
       selector:
         action: {}
@@ -195,7 +195,7 @@ action:
         sequence:
           - choose:
               - conditions:
-                  # single click, check if on_if_on is enabled
+# single click, check if on_if_on is enabled
                   - condition: template
                     value_template: "{{ on_if_on_enabled }}"
                   - condition: state
@@ -215,13 +215,20 @@ action:
         timeout:
           milliseconds: !input helper_double_click_delay
         continue_on_timeout: true
-      # double click
+# Double click
       - choose:
           - conditions:
               - condition: template
                 value_template: '{{ wait.trigger == none }}'
             sequence: !input on_double_click_action
-        default: !input on_triple_click_action
+# Triple click, if action is defined
+        default:
+          - if:
+              - condition: template
+                value_template: "!input on_triple_click_action is defined"
+            then: !input on_triple_click_action
+            else: !input on_double_click_action
+
 #trigger:
 #  - platform: event
 #    event_type: zha_event
