@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Trådfri Sensor
-  description: "## IKEA TRÅDFRI sensor (v1.04)
+  description: "## IKEA TRÅDFRI sensor (v1.05)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -25,11 +25,15 @@ blueprint:
       description: IKEA Trådfri sensor to use.
       default: ""
       selector:
-        device:
+        entity:
           filter:
-            integration: zha
+            domain: binary_sensor
             manufacturer: IKEA of Sweden
-            entity_id: binary_sensor.ikea_of_sweden_tradfri_motion_sensor_motion
+#        device:
+#          filter:
+#            integration: zha
+#            manufacturer: IKEA of Sweden
+#            entity_id: binary_sensor.ikea_of_sweden_tradfri_motion_sensor_motion
 #            domain: binary_sensor
 #            model: TRAADFRI Sensor
           multiple: false
