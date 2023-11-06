@@ -1,0 +1,11 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+/git_toolbox_prj.xml
+/misc.xml
+/modules.xml
+/vcs.xml
+/zha.iml
+/sonarlint/*
+/yamllint.xml
+/codeStyles/codeStyleConfig.xml
