@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Trådfri Sensor
-  description: "## IKEA TRÅDFRI sensor (v1.0)
+  description: "## IKEA TRÅDFRI sensor (v1.01)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -41,7 +41,7 @@ mode: single
 trigger:
   - type: motion
     platform: device
-    device_id: !input remote_device
+    device_id: !input sensor_device
 #    entity_id: binary_sensor.ikea_of_sweden_tradfri_motion_sensor_motion
     domain: binary_sensor
     id: motion-detected
