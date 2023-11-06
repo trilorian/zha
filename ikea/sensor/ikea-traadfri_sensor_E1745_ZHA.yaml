@@ -1,6 +1,7 @@
 blueprint:
   name: IKEA Trådfri Sensor
-  description: "## IKEA TRÅDFRI sensor (v1.08)
+
+  description: "## IKEA TRÅDFRI sensor (v1.09)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -21,8 +22,11 @@ blueprint:
 
     - Light on level (when you turn
     "
+
   source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
+
   domain: automation
+
   input:
     sensor_device:
       name: Sensor
@@ -34,31 +38,41 @@ blueprint:
             domain: binary_sensor
             device_class: motion
           multiple: false
-    on_detected_action:
-      name: Motion detected action
-      description: Choose action(s) to run when motion is detected.
-      default: []
+    light_target:
+      name: Light
       selector:
-        action: {}
-mode: single
+        target:
+          entity:
+            domain: light
+    no_motion_wait:
+      name: Wait time
+      description: Time to leave the light on after last motion is detected.
+      default: 120
+      selector:
+        number:
+          min: 0
+          max: 30
+          unit_of_measurement: seconds
+
+# If motion is detected within the delay, restart the script
+mode: restart
+
+max_exceeded: silent
+
 trigger:
-  - type: motion
-    platform: device
-    device_id: !input sensor_device
-#    entity_id: binary_sensor.ikea_of_sweden_tradfri_motion_sensor_motion
-    domain: binary_sensor
-    id: motion-detected
-#  - platform: event
-#    event_type: zha_event
-#    event_data:
-#      device_id: "{{ zha_remote }}"
-#      command: "on"
-#      cluster_id: 6
-#      endpoint_id: 1
-#    id: click-on-zha
-#condition: []
+  platform: state
+  entity_id: !input motion_entity
+  from: "off"
+  to: "on"
+
 action:
-  - conditions:
-      - condition: trigger
-        id: motion-detected
-    sequence: !input on_detected_action
+  - service: light.turn_on
+    target: !input light_target
+  - wait_for_trigger:
+      platform: state
+      entity_id: !input motion_entity
+      from: "on"
+      to: "off"
+  - delay: !input no_motion_wait
+  - service: light.turn_off
+    target: !input light_target
