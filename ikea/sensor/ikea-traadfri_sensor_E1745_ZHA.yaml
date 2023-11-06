@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Trådfri Sensor
-  description: "## IKEA TRÅDFRI sensor (v1.01)
+  description: "## IKEA TRÅDFRI sensor (v1.02)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -29,6 +29,7 @@ blueprint:
           filter:
             integration: zha
             manufacturer: IKEA of Sweden
+            domain: binary_sensor
 #            model: RODRET Dimmer
           multiple: false
     on_detected_action:
