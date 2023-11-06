@@ -1,0 +1,62 @@
+blueprint:
+  name: IKEA Trådfri Sensor
+  description: "## IKEA TRÅDFRI sensor (v1.0)
+
+
+    Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
+
+
+    Available controls:
+
+    - Click the **on** or **off** buttons
+
+    - Click and hold the **on**/**off** buttons (optional). Actions will be executed every **Helper - Hold delay**,
+      but maximum **Helper - Max number of loops** times.
+
+    - Double click the **on** or **off** buttons (optional) in **Helper - Multi click delay** interval.
+
+    - Triple click the **on** or **off** buttons (optional) in **Helper - Multi click delay** interval.
+    "
+  source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
+  domain: automation
+  input:
+    sensor_device:
+      name: Sensor
+      description: IKEA Trådfri sensor to use.
+      default: ""
+      selector:
+        device:
+          filter:
+            integration: zha
+            manufacturer: IKEA of Sweden
+#            model: RODRET Dimmer
+          multiple: false
+    on_detected_action:
+      name: Motion detected action
+      description: Choose action(s) to run when motion is detected.
+      default: []
+      selector:
+        action: {}
+mode: single
+trigger:
+  - type: motion
+    platform: device
+    device_id: !input remote_device
+#    entity_id: binary_sensor.ikea_of_sweden_tradfri_motion_sensor_motion
+    domain: binary_sensor
+    id: motion-detected
+#  - platform: event
+#    event_type: zha_event
+#    event_data:
+#      device_id: "{{ zha_remote }}"
+#      command: "on"
+#      cluster_id: 6
+#      endpoint_id: 1
+#    id: click-on-zha
+condition: []
+action:
+  - conditions:
+      - condition: trigger
+        id:
+          - click-on-zha
+    sequence: !input on_detected_action
