@@ -1,7 +1,7 @@
 blueprint:
   name: IKEA Trådfri Sensor
 
-  description: "## IKEA TRÅDFRI sensor (v1.09)
+  description: "## IKEA TRÅDFRI sensor (v1.10)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -61,7 +61,7 @@ max_exceeded: silent
 
 trigger:
   platform: state
-  entity_id: !input motion_entity
+  entity_id: !input sensor_device
   from: "off"
   to: "on"
 
@@ -70,7 +70,7 @@ action:
     target: !input light_target
   - wait_for_trigger:
       platform: state
-      entity_id: !input motion_entity
+      entity_id: !input sensor_device
       from: "on"
       to: "off"
   - delay: !input no_motion_wait
