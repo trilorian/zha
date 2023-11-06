@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Trådfri Sensor
-  description: "## IKEA TRÅDFRI sensor (v1.11)
+  description: "## IKEA TRÅDFRI sensor (v1.12)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -100,7 +100,7 @@ trigger:
 #  below: !input lux_level
 action:
   - service: light.turn_on
-    target: !input light_target
+    target: !input light_entity
   - wait_for_trigger:
       platform: state
       entity_id: !input motion_entity
@@ -109,4 +109,4 @@ action:
     {{ local_motion_delay_day - local_motion_dim_time }} {% else %} {{ local_motion_delay_night
     - local_motion_dim_time }} {% endif %} '
   - service: light.turn_off
-    target: !input light_target
+    target: !input light_entity
