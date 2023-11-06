@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Trådfri Sensor
-  description: "## IKEA TRÅDFRI sensor (v1.05)
+  description: "## IKEA TRÅDFRI sensor (v1.06)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -8,14 +8,17 @@ blueprint:
 
     Available controls:
 
-    - Click the **on** or **off** buttons
+    - Motion detected
 
-    - Click and hold the **on**/**off** buttons (optional). Actions will be executed every **Helper - Hold delay**,
-      but maximum **Helper - Max number of loops** times.
+    - Motion no longer detected
 
-    - Double click the **on** or **off** buttons (optional) in **Helper - Multi click delay** interval.
+    Available settings:
 
-    - Triple click the **on** or **off** buttons (optional) in **Helper - Multi click delay** interval.
+    - Nighttime hours and light level
+
+    - Daytime hours and light level
+
+    - Light on level (when you turn
     "
   source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
   domain: automation
@@ -28,7 +31,7 @@ blueprint:
         entity:
           filter:
             domain: binary_sensor
-            manufacturer: IKEA of Sweden
+#            manufacturer: IKEA of Sweden
 #        device:
 #          filter:
 #            integration: zha
