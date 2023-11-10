@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Trådfri Sensor
-  description: "## IKEA TRÅDFRI motion sensor (v1.21)
+  description: "## IKEA TRÅDFRI motion sensor (v1.22)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -18,7 +18,7 @@ blueprint:
     - Time to wait before performing the motion no longer detected action
 
 
-    Trådfri motor sensor waits for 3 minutes before sending 'no longer detected'.
+    Trådfri motion sensor waits for 3 minutes before sending 'no longer detected'.
 
 
     Can actually be used for any motion sensor.
