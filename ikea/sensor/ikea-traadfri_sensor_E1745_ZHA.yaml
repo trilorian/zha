@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Trådfri Sensor
-  description: "## IKEA TRÅDFRI sensor (v1.12)
+  description: "## IKEA TRÅDFRI motion sensor (v1.13)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -15,17 +15,15 @@ blueprint:
 
     Available settings:
 
-    - Nighttime hours and light level
+    - Time to leave the light on after last motion is detected
 
-    - Daytime hours and light level
-
-    - Light on level (when you turn
+    Can actually be used for any motion sensor.
     "
 
   source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
   domain: automation
   input:
-    motion_entity:
+    motion_sensor:
       name: Motion Sensor
       description: The motion sensor to use.
       default: ""
@@ -35,16 +33,21 @@ blueprint:
             domain: binary_sensor
             device_class: motion
           multiple: false
-    light_entity:
-      name: Light
+    detected_action:
+      name: Motion detected action
+      description: Choose action(s) to run when motion is detected.
+      default: []
       selector:
-        target:
-          entity:
-            domain: light
-    no_motion_wait_day:
-      name: Wait time (day)
-      description: Time to leave the light on after last motion is detected during
-        the day.
+        action: {}
+    not_detected_action:
+      name: Motion no longer detected action
+      description: Choose action(s) to run when motion is no longer detected.
+      default: []
+      selector:
+        action: {}
+    no_motion_delay:
+      name: Delay time (seconds)
+      description: Time to wait before performing the **motion no longer detected** action
       default: 300
       selector:
         number:
@@ -53,60 +56,21 @@ blueprint:
           unit_of_measurement: seconds
           step: 1.0
           mode: slider
-    no_motion_wait_night:
-      name: Wait time (night)
-      description: Time to leave the light on after last motion is detected during
-        the night.
-      default: 30
-      selector:
-        number:
-          min: 0.0
-          max: 3600.0
-          unit_of_measurement: seconds
-          step: 1.0
-          mode: slider
-    night_time_start_helper:
-      name: Nighttime helper (Start)
-      description: When does nighttime start
-      selector:
-        entity:
-          domain:
-            - input_datetime
-          multiple: false
-    night_time_end_helper:
-      name: Nighttime helper (End)
-      description: When does nighttime end
-      selector:
-        entity:
-          domain:
-            - input_datetime
-          multiple: false
 # If motion is detected within the delay, restart the script
 mode: restart
 max_exceeded: silent
-variables:
-  local_night_end: !input night_time_end_helper
-  local_night_start: !input night_time_start_helper
-  local_motion_delay_day: !input no_motion_wait_day
-  local_motion_delay_night: !input no_motion_wait_night
 trigger:
   platform: state
-  entity_id: !input motion_entity
+  entity_id: !input motion_sensor
   from: 'off'
   to: 'on'
-#condition:
-#  condition: numeric_state
-#  entity_id: !input lux_entity
-#  below: !input lux_level
 action:
-  - service: light.turn_on
-    target: !input light_entity
+  - sequence: !input detected_action
   - wait_for_trigger:
       platform: state
-      entity_id: !input motion_entity
+      entity_id: !input motion_sensor
       from: 'on'
-  - delay: ' {% if today_at(states(local_night_end)) < now() or now() < today_at(states(local_night_start))  %}
-    {{ local_motion_delay_day - local_motion_dim_time }} {% else %} {{ local_motion_delay_night
-    - local_motion_dim_time }} {% endif %} '
-  - service: light.turn_off
-    target: !input light_entity
+      to: 'off'
+  - delay:
+      seconds: !input no_motion_delay
+  - sequence: !input not_detected_action
