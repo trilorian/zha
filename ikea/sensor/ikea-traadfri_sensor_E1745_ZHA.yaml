@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Trådfri Sensor
-  description: "## IKEA TRÅDFRI motion sensor (v1.17)
+  description: "## IKEA TRÅDFRI motion sensor (v1.18)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -73,7 +73,8 @@ action:
       platform: state
       entity_id: !input motion_sensor
       to: 'off'
-  - delay: !input no_motion_wait
+  - delay:
+      seconds: !input no_motion_wait
   - alias: "Run the motion no longer detected action"
     choose: []
     default: !input not_detected_action
