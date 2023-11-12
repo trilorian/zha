@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Trådfri Sensor
-  description: "## IKEA TRÅDFRI motion sensor (v1.22)
+  description: "## IKEA TRÅDFRI motion sensor (v1.23)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -26,6 +26,7 @@ blueprint:
 
   source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
   domain: automation
+
   input:
     motion_sensor:
       name: Motion Sensor
@@ -60,16 +61,20 @@ blueprint:
           unit_of_measurement: minute
           step: 1.0
           mode: slider
+
 # If motion is detected within the delay, restart the script
 mode: restart
 max_exceeded: silent
+
 variables:
   no_motion_wait: !input no_motion_wait
+
 trigger:
   platform: state
   entity_id: !input motion_sensor
   from: 'off'
   to: 'on'
+
 action:
   - alias: "Run the motion detected action"
     choose: []
@@ -77,6 +82,7 @@ action:
   - wait_for_trigger:
       platform: state
       entity_id: !input motion_sensor
+      from: "on"
       to: 'off'
   - delay:
       minutes: '{{no_motion_wait}}'
