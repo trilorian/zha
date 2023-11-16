@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.81)
+  description: "## IKEA RODRET Dimmer remote (v1.82)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -208,7 +208,7 @@ action:
                           - conditions:
                               # Double click, check if on_double_click_action is defined
                               - condition: template
-                                value_template: "{{ on_double_click_action != null }}"
+                                value_template: "{{ on_double_click_action != none }}"
                             sequence: !input on_double_click_action
                         default: !input on_click_action
                 default:
@@ -216,7 +216,7 @@ action:
                       - conditions:
                           # Triple click, check if on_triple_click_action is defined
                           - condition: template
-                            value_template: "{{ on_triple_click_action != null }}"
+                            value_template: "{{ on_triple_click_action != none }}"
                         sequence: !input on_triple_click_action
                     default: !input on_click_action
   - choose:
@@ -262,7 +262,7 @@ action:
                           - conditions:
                               # Double click, check if off_double_click_action is defined
                               - condition: template
-                                value_template: "{{ off_double_click_action != null }}"
+                                value_template: "{{ off_double_click_action != none }}"
                             sequence: !input off_double_click_action
                         default: !input off_click_action
                 default:
@@ -270,7 +270,7 @@ action:
                       - conditions:
                           # Triple click, check if off_triple_click_action is defined
                           - condition: template
-                            value_template: "{{ off_triple_click_action != null }}"
+                            value_template: "{{ off_triple_click_action != none }}"
                         sequence: !input off_triple_click_action
                     default: !input off_click_action
       - conditions:
