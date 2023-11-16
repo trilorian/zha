@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.78)
+  description: "## IKEA RODRET Dimmer remote (v1.79)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -156,7 +156,6 @@ blueprint:
 mode: single
 max_exceeded: silent
 trigger_variables:
-  on_hold_enabled: !input on_hold_enabled
   off_hold_enabled: !input off_hold_enabled
   on_double_click_enabled: !input on_double_click_enabled
   on_triple_click_enabled: !input on_triple_click_enabled
@@ -319,9 +318,6 @@ action:
           - condition: trigger
             id:
               - hold-on-zha
-          - condition: template
-            value_template: "{{ on_hold_enabled }}"
-        sequence:
           - repeat:
               count: !input helper_max_loops
               sequence:
