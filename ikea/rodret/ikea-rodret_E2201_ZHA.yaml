@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.79)
+  description: "## IKEA RODRET Dimmer remote (v1.81)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -10,12 +10,11 @@ blueprint:
 
     - Click the **on** or **off** buttons
 
-    - Click and hold the **on**/**off** buttons (optional). Actions will be executed every **Helper - Hold delay**,
-      but maximum **Helper - Max number of loops** times.
+    - Click and hold the **on**/**off** buttons (optional)
 
-    - Double click the **on** or **off** buttons (optional) in **Helper - Multi click delay** interval.
+    - Double click the **on** or **off** buttons (optional)
 
-    - Triple click the **on** or **off** buttons (optional) in **Helper - Multi click delay** interval.
+    - Triple click the **on** or **off** buttons (optional)
     "
   source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
   domain: automation
@@ -46,77 +45,42 @@ blueprint:
     on_hold_action:
       name: On - Hold action (Optional)
       description:
-        Choose action(s) to run when **on** button is **clicked and held**. **On - Hold enabled** must be set.
+        Choose action(s) to run when **on** button is **clicked and held**.
       default: []
       selector:
         action: {}
-    off_hold_enabled:
-      name: Off - Hold enabled
-      description:
-        Choose whether or not to react to the **hold** event for the **off** button.
-      default: false
-      selector:
-        boolean: {}
     off_hold_action:
-      name: Off - Hold action
+      name: Off - Hold action (Optional)
       description:
-        Choose action(s) to run when **off** button is **clicked and held**. **Off - Hold enabled** must be set.
+        Choose action(s) to run when **off** button is **clicked and held**.
       default: []
       selector:
         action: {}
-    on_double_click_enabled:
-      name: On - Double click enabled
-      description:
-        Choose whether or not to react to the **double click** event for the **on** button.
-      default: false
-      selector:
-        boolean: {}
     on_double_click_action:
-      name: On - Double click action
+      name: On - Double click action (Optional)
       description:
-        Choose action(s) to run when clicking the **on** button twice in **Helper - Multi click delay** interval. **On - Double click enabled** must be set.
+        Choose action(s) to run when clicking the **on** button twice.
       default: []
       selector:
         action: {}
-    on_triple_click_enabled:
-      name: On - Triple click enabled
-      description:
-        Choose whether or not to react to the **triple click** event for the **on** button.
-      default: false
-      selector:
-        boolean: {}
     on_triple_click_action:
-      name: On - Triple click action
+      name: On - Triple click action (Optional)
       description:
-        Choose action(s) to run when clicking the **on** button three times in **Helper - Multi click delay** interval. **On - Triple click enabled** must be set.
+        Choose action(s) to run when clicking the **on** button three times.
       default: []
       selector:
         action: {}
-    off_double_click_enabled:
-      name: Off - Double click enabled
-      description:
-        Choose whether or not to react to the **double click** event for the **off** button.
-      default: false
-      selector:
-        boolean: {}
     off_double_click_action:
-      name: Off - Double click action
+      name: Off - Double click action (Optional)
       description:
-        Choose action(s) to run when clicking the **off** button twice in **Helper - Multi click delay** interval. **Off - Double click enabled** must be set.
+        Choose action(s) to run when clicking the **off** button twice.
       default: []
       selector:
         action: {}
-    off_triple_click_enabled:
-      name: Off - Triple click enabled
-      description:
-        Choose whether or not to react to the **triple click** event for the **off** button.
-      default: false
-      selector:
-        boolean: {}
     off_triple_click_action:
-      name: Off - Triple click action
+      name: Off - Triple click action (Optional)
       description:
-        Choose action(s) to run when clicking the **off** button three times in **Helper - Multi click delay** interval. **Off - Double click enabled** must be set.
+        Choose action(s) to run when clicking the **off** button three times.
       default: []
       selector:
         action: {}
@@ -156,11 +120,6 @@ blueprint:
 mode: single
 max_exceeded: silent
 trigger_variables:
-  off_hold_enabled: !input off_hold_enabled
-  on_double_click_enabled: !input on_double_click_enabled
-  on_triple_click_enabled: !input on_triple_click_enabled
-  off_double_click_enabled: !input off_double_click_enabled
-  off_triple_click_enabled: !input off_double_click_enabled
   zha_remote: !input remote_device
 trigger:
   - platform: event
@@ -247,17 +206,17 @@ action:
                     sequence:
                       - choose:
                           - conditions:
-                              # Double click, check if on_double_click_enabled
+                              # Double click, check if on_double_click_action is defined
                               - condition: template
-                                value_template: "{{ on_double_click_enabled }}"
+                                value_template: "{{ on_double_click_action != null }}"
                             sequence: !input on_double_click_action
                         default: !input on_click_action
                 default:
                   - choose:
                       - conditions:
-                          # Triple click, check if on_triple_click_enabled
+                          # Triple click, check if on_triple_click_action is defined
                           - condition: template
-                            value_template: "{{ on_triple_click_enabled }}"
+                            value_template: "{{ on_triple_click_action != null }}"
                         sequence: !input on_triple_click_action
                     default: !input on_click_action
   - choose:
@@ -301,23 +260,24 @@ action:
                     sequence:
                       - choose:
                           - conditions:
-                              # Double click, check if off_double_click_enabled
+                              # Double click, check if off_double_click_action is defined
                               - condition: template
-                                value_template: "{{ off_double_click_enabled }}"
+                                value_template: "{{ off_double_click_action != null }}"
                             sequence: !input off_double_click_action
                         default: !input off_click_action
                 default:
                   - choose:
                       - conditions:
-                          # Triple click, check if off_triple_click_enabled
+                          # Triple click, check if off_triple_click_action is defined
                           - condition: template
-                            value_template: "{{ off_triple_click_enabled }}"
+                            value_template: "{{ off_triple_click_action != null }}"
                         sequence: !input off_triple_click_action
                     default: !input off_click_action
       - conditions:
           - condition: trigger
             id:
               - hold-on-zha
+        sequence:
           - repeat:
               count: !input helper_max_loops
               sequence:
@@ -350,8 +310,6 @@ action:
           - condition: trigger
             id:
               - hold-off-zha
-          - condition: template
-            value_template: "{{ off_hold_enabled }}"
         sequence:
           - repeat:
               count: !input helper_max_loops
