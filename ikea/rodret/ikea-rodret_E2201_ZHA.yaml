@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.77)
+  description: "## IKEA RODRET Dimmer remote (v1.78)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -43,15 +43,8 @@ blueprint:
       default: []
       selector:
         action: {}
-    on_hold_enabled:
-      name: On - Hold enabled
-      description:
-        Choose whether or not to react to the **hold** event for the **on** button.
-      default: false
-      selector:
-        boolean: {}
     on_hold_action:
-      name: On - Hold action
+      name: On - Hold action (Optional)
       description:
         Choose action(s) to run when **on** button is **clicked and held**. **On - Hold enabled** must be set.
       default: []
