@@ -1,6 +1,6 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.84)
+  description: "## IKEA RODRET Dimmer remote (v1.85)
 
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
@@ -10,11 +10,14 @@ blueprint:
 
     - Click the **on** or **off** buttons
 
-    - Click and hold the **on**/**off** buttons (optional)
+    - Click and hold the **on**/**off** buttons
 
-    - Double click the **on** or **off** buttons (optional)
+    - Double click the **on** or **off** buttons
 
-    - Triple click the **on** or **off** buttons (optional)
+    - Triple click the **on** or **off** buttons
+
+
+    All actions are optional.
     "
   source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
   domain: automation
@@ -42,43 +45,60 @@ blueprint:
       default: []
       selector:
         action: {}
+    light_target:
+      name: Light target
+      selector:
+        target:
+          entity:
+            domain: light
+    brightness_step_pct:
+      name: Brightness step
+      description:
+        Choose a step to increase/decrease brightness, default is 10%.
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 50
+          step: 1
+          mode: slider
     on_hold_action:
-      name: On - Hold action (Optional)
+      name: On - Hold action
       description:
         Choose action(s) to run when **on** button is **clicked and held**.
       default: []
       selector:
         action: {}
     off_hold_action:
-      name: Off - Hold action (Optional)
+      name: Off - Hold action
       description:
         Choose action(s) to run when **off** button is **clicked and held**.
       default: []
       selector:
         action: {}
     on_double_click_action:
-      name: On - Double click action (Optional)
+      name: On - Double click action
       description:
         Choose action(s) to run when clicking the **on** button twice.
       default: []
       selector:
         action: {}
     on_triple_click_action:
-      name: On - Triple click action (Optional)
+      name: On - Triple click action
       description:
         Choose action(s) to run when clicking the **on** button three times.
       default: []
       selector:
         action: {}
     off_double_click_action:
-      name: Off - Double click action (Optional)
+      name: Off - Double click action
       description:
         Choose action(s) to run when clicking the **off** button twice.
       default: []
       selector:
         action: {}
     off_triple_click_action:
-      name: Off - Triple click action (Optional)
+      name: Off - Triple click action
       description:
         Choose action(s) to run when clicking the **off** button three times.
       default: []
@@ -314,28 +334,19 @@ action:
           - repeat:
               count: !input helper_max_loops
               sequence:
-                - parallel:
-                    - sequence: !input off_hold_action
-                    - sequence:
-                        - choose:
-                            - conditions:
-                                - condition: trigger
-                                  id:
-                                    - hold-off-zha
-                              sequence:
-                                - wait_for_trigger:
-                                    - platform: event
-                                      event_type: zha_event
-                                      event_data:
-                                        device_id: "{{ zha_remote }}"
-                                        command: "stop_with_on_off"
-                                        cluster_id: 8
-                                        endpoint_id: 1
-                                  timeout:
-                                    milliseconds: !input helper_hold_delay
-                                  continue_on_timeout: true
-                                - if:
-                                    - condition: template
-                                      value_template: "{{ wait.trigger.idx is defined }}"
-                                  then:
-                                    - stop: button released
+                repeat:
+                  while:
+                    - condition: template
+                      value_template: "{{ repeat.index < 10 }}"
+                  sequence:
+                    - service: light.turn_on
+                      target: !input light_target
+                      data:
+                        transition: 1
+                        brightness_step_pct: -10
+                    - delay: 1
+                    - if:
+                        - condition: template
+                          value_template: "{{ wait.trigger.idx is defined }}"
+                      then:
+                        - stop: button released
