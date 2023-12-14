@@ -1,0 +1,122 @@
+blueprint:
+  name: Generic Motion Sensor
+  description: "## Generic motion sensor (v1.0)
+
+
+    Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
+
+
+    Available controls:
+
+    - Motion detected
+
+    - Motion no longer detected
+
+
+    Available settings:
+
+    - Time to wait before performing the motion no longer detected action
+    "
+
+  source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
+  domain: automation
+
+  input:
+    motion_sensor:
+      name: Motion Sensor
+      description: The motion sensor to use.
+      default: ""
+      selector:
+        entity:
+          filter:
+            domain: binary_sensor
+            device_class: motion
+          multiple: false
+    detected_action:
+      name: Motion detected action
+      description: Choose action(s) to run when motion is detected.
+      default: []
+      selector:
+        action: {}
+    not_detected_action:
+      name: Motion no longer detected action
+      description: Choose action(s) to run when motion is no longer detected.
+      default: []
+      selector:
+        action: {}
+    no_motion_wait:
+      name: Wait time
+      description: Time to wait before performing the **motion no longer detected** action
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 240
+          unit_of_measurement: minute
+          step: 1.0
+          mode: slider
+
+# If motion is detected within the delay, restart the script
+mode: restart
+max_exceeded: silent
+
+variables:
+  no_motion_wait: !input no_motion_wait
+
+trigger_variables:
+  sensor: !input motion_sensor
+trigger:
+  - type: motion
+    platform: device
+    device_id: !input motion_sensor
+    domain: binary_sensor
+    id: motion
+  - type: no_motion
+    platform: device
+    device_id: !input motion_sensor
+    domain: binary_sensor
+    id: motion_cleared
+
+condition: []
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - motion
+#          - type: is_illuminance
+#            condition: device
+#            entity_id: !input motion_sensor
+#            domain: sensor
+#            below: 18
+#          - condition: or
+#            conditions:
+#              - condition: time
+#                after: "07:00:00"
+#                before: "23:00:00"
+#                weekday:
+#                  - fri
+#                  - thu
+#                  - wed
+#                  - tue
+#                  - mon
+#              - condition: time
+#                after: "08:30:00"
+#                before: "23:00:00"
+#                weekday:
+#                  - sat
+#                  - sun
+        sequence: !input detected_action
+#          - type: turn_on
+#            entity_id: !input motion_sensor
+#            domain: light
+#            brightness_pct: 50
+      - conditions:
+          - condition: trigger
+            id:
+              - motion_cleared
+        sequence: !input not_detected_action
+#          - type: turn_off
+#            entity_id: !input motion_sensor
+#            domain: light
