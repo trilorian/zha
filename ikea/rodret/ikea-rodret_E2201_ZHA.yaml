@@ -1,25 +1,19 @@
 blueprint:
   name: IKEA Rodret Dimmer
-  description: "## IKEA RODRET Dimmer remote (v1.85)
-
+  description: "## IKEA RODRET Dimmer remote (v1.86)
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
-
 
     Available controls:
 
     - Click the **on** or **off** buttons
 
-    - Click and hold the **on**/**off** buttons
+    - Double click the **on** or **off** buttons (optional)
 
-    - Double click the **on** or **off** buttons
+    - Triple click the **on** or **off** buttons (optional)
 
-    - Triple click the **on** or **off** buttons
-
-
-    All actions are optional.
-    "
-  source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
+    - Click and hold the **on**/**off** buttons (optional)"
+  source_url: https://gist.github.com/trilorian/9ab79ba93afe09e370bb155b548f7b50
   domain: automation
   input:
     remote_device:
@@ -29,9 +23,9 @@ blueprint:
       selector:
         device:
           filter:
-            integration: zha
-            manufacturer: IKEA of Sweden
-            model: RODRET Dimmer
+            - integration: zha
+              manufacturer: IKEA of Sweden
+              model: RODRET Dimmer
           multiple: false
     on_click_action:
       name: On - Single click action
@@ -45,69 +39,50 @@ blueprint:
       default: []
       selector:
         action: {}
-    light_target:
-      name: Light target
-      selector:
-        target:
-          entity:
-            domain: light
-    brightness_step_pct:
-      name: Brightness step
-      description:
-        Choose a step to increase/decrease brightness, default is 10%.
-      default: 10
-      selector:
-        number:
-          min: 1
-          max: 50
-          step: 1
-          mode: slider
-    on_hold_action:
-      name: On - Hold action
-      description:
-        Choose action(s) to run when **on** button is **clicked and held**.
-      default: []
-      selector:
-        action: {}
-    off_hold_action:
-      name: Off - Hold action
-      description:
-        Choose action(s) to run when **off** button is **clicked and held**.
-      default: []
-      selector:
-        action: {}
     on_double_click_action:
-      name: On - Double click action
-      description:
-        Choose action(s) to run when clicking the **on** button twice.
+      name: On - Double click action (Optional)
+      description: Choose action(s) to run when clicking the **on** button twice.
       default: []
       selector:
         action: {}
     on_triple_click_action:
-      name: On - Triple click action
-      description:
-        Choose action(s) to run when clicking the **on** button three times.
+      name: On - Triple click action (Optional)
+      description: Choose action(s) to run when clicking the **on** button three times.
       default: []
       selector:
         action: {}
     off_double_click_action:
-      name: Off - Double click action
-      description:
-        Choose action(s) to run when clicking the **off** button twice.
+      name: Off - Double click action (Optional)
+      description: Choose action(s) to run when clicking the **off** button twice.
       default: []
       selector:
         action: {}
     off_triple_click_action:
-      name: Off - Triple click action
+      name: Off - Triple click action (Optional)
       description:
-        Choose action(s) to run when clicking the **off** button three times.
+        Choose action(s) to run when clicking the **off** button three
+        times.
+      default: []
+      selector:
+        action: {}
+    on_hold_action:
+      name: On - Hold action (Optional)
+      description: Choose action(s) to run when **on** button is **clicked and held**.
+      default: []
+      selector:
+        action: {}
+    off_hold_action:
+      name: Off - Hold action (Optional)
+      description: Choose action(s) to run when **off** button is **clicked and held**.
       default: []
       selector:
         action: {}
     helper_multi_click_delay:
       name: Helper - Multi click delay
       description:
-        Max delay between the button clicks for the **Multi click events**. Change this value if you notice that the multi click action is not triggered properly.
+        Max delay between the button clicks for the **Multi click events**.
+        Change this value if you notice that the multi click action is not triggered
+        properly.
       default: 250
       selector:
         number:
@@ -141,8 +116,8 @@ mode: single
 max_exceeded: silent
 trigger_variables:
   zha_remote: !input remote_device
-trigger:
-  - platform: event
+triggers:
+  - trigger: event
     event_type: zha_event
     event_data:
       device_id: "{{ zha_remote }}"
@@ -150,7 +125,7 @@ trigger:
       cluster_id: 6
       endpoint_id: 1
     id: click-on-zha
-  - platform: event
+  - trigger: event
     event_type: zha_event
     event_data:
       device_id: "{{ zha_remote }}"
@@ -158,29 +133,35 @@ trigger:
       cluster_id: 6
       endpoint_id: 1
     id: click-off-zha
-  - platform: event
+  - trigger: event
     event_type: zha_event
     event_data:
       device_id: "{{ zha_remote }}"
-      command: "move_with_on_off"
+      command: move_with_on_off
       cluster_id: 8
       endpoint_id: 1
-      args: [0, 83]
+      args:
+        - 0
+        - 83
     id: hold-on-zha
-  - platform: event
+  - trigger: event
     event_type: zha_event
     event_data:
       device_id: "{{ zha_remote }}"
-      command: "move"
+      command: move
       cluster_id: 8
       endpoint_id: 1
-      args: [1, 83, 0, 0]
+      args:
+        - 1
+        - 83
+        - 0
+        - 0
     id: hold-off-zha
-  - platform: event
+  - trigger: event
     event_type: zha_event
     event_data:
       device_id: "{{ zha_remote }}"
-      command: "stop_with_on_off"
+      command: stop_with_on_off
       cluster_id: 8
       endpoint_id: 1
     id: release-zha
@@ -192,7 +173,7 @@ action:
               - click-on-zha
         sequence:
           - wait_for_trigger:
-              - platform: event
+              - trigger: event
                 event_type: zha_event
                 event_data:
                   device_id: "{{ zha_remote }}"
@@ -205,11 +186,11 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: '{{ wait.trigger == none }}'
+                    value_template: "{{ wait.trigger == none }}"
                 sequence: !input on_click_action
             default:
               - wait_for_trigger:
-                  - platform: event
+                  - trigger: event
                     event_type: zha_event
                     event_data:
                       device_id: "{{ zha_remote }}"
@@ -222,11 +203,10 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template: '{{ wait.trigger == none }}'
+                        value_template: "{{ wait.trigger == none }}"
                     sequence:
                       - choose:
                           - conditions:
-                              # Double click, check if on_double_click_action is defined
                               - condition: template
                                 value_template: "{{ on_double_click_action != none }}"
                             sequence: !input on_double_click_action
@@ -234,7 +214,6 @@ action:
                 default:
                   - choose:
                       - conditions:
-                          # Triple click, check if on_triple_click_action is defined
                           - condition: template
                             value_template: "{{ on_triple_click_action != none }}"
                         sequence: !input on_triple_click_action
@@ -246,7 +225,7 @@ action:
               - click-off-zha
         sequence:
           - wait_for_trigger:
-              - platform: event
+              - trigger: event
                 event_type: zha_event
                 event_data:
                   device_id: "{{ zha_remote }}"
@@ -259,11 +238,11 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: '{{ wait.trigger == none }}'
+                    value_template: "{{ wait.trigger == none }}"
                 sequence: !input off_click_action
             default:
               - wait_for_trigger:
-                  - platform: event
+                  - trigger: event
                     event_type: zha_event
                     event_data:
                       device_id: "{{ zha_remote }}"
@@ -276,11 +255,10 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template: '{{ wait.trigger == none }}'
+                        value_template: "{{ wait.trigger == none }}"
                     sequence:
                       - choose:
                           - conditions:
-                              # Double click, check if off_double_click_action is defined
                               - condition: template
                                 value_template: "{{ off_double_click_action != none }}"
                             sequence: !input off_double_click_action
@@ -288,7 +266,6 @@ action:
                 default:
                   - choose:
                       - conditions:
-                          # Triple click, check if off_triple_click_action is defined
                           - condition: template
                             value_template: "{{ off_triple_click_action != none }}"
                         sequence: !input off_triple_click_action
@@ -311,11 +288,11 @@ action:
                                     - hold-on-zha
                               sequence:
                                 - wait_for_trigger:
-                                    - platform: event
+                                    - trigger: event
                                       event_type: zha_event
                                       event_data:
                                         device_id: "{{ zha_remote }}"
-                                        command: "stop_with_on_off"
+                                        command: stop_with_on_off
                                         cluster_id: 8
                                         endpoint_id: 1
                                   timeout:
@@ -334,19 +311,28 @@ action:
           - repeat:
               count: !input helper_max_loops
               sequence:
-                repeat:
-                  while:
-                    - condition: template
-                      value_template: "{{ repeat.index < 10 }}"
-                  sequence:
-                    - service: light.turn_on
-                      target: !input light_target
-                      data:
-                        transition: 1
-                        brightness_step_pct: -10
-                    - delay: 1
-                    - if:
-                        - condition: template
-                          value_template: "{{ wait.trigger.idx is defined }}"
-                      then:
-                        - stop: button released
+                - parallel:
+                    - sequence: !input off_hold_action
+                    - sequence:
+                        - choose:
+                            - conditions:
+                                - condition: trigger
+                                  id:
+                                    - hold-off-zha
+                              sequence:
+                                - wait_for_trigger:
+                                    - trigger: event
+                                      event_type: zha_event
+                                      event_data:
+                                        device_id: "{{ zha_remote }}"
+                                        command: stop_with_on_off
+                                        cluster_id: 8
+                                        endpoint_id: 1
+                                  timeout:
+                                    milliseconds: !input helper_hold_delay
+                                  continue_on_timeout: true
+                                - if:
+                                    - condition: template
+                                      value_template: "{{ wait.trigger.idx is defined }}"
+                                  then:
+                                    - stop: button released
