@@ -1,18 +1,18 @@
 blueprint:
-  name: IKEA Rodret Dimmer v. 1.3
-  description: "## IKEA RODRET Dimmer remote (v1.86)
+  name: IKEA Rodret Dimmer v. 1.4
+  description: "## IKEA RODRET Dimmer remote (v1.87)
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
 
-    Available controls:
+    Available controls (optional):
 
     - Click the **on** or **off** buttons
 
-    - Double click the **on** or **off** buttons (optional)
+    - Double click the **on** or **off** buttons
 
-    - Triple click the **on** or **off** buttons (optional)
+    - Triple click the **on** or **off** buttons
 
-    - Click and hold the **on**/**off** buttons (optional)"
+    - Click and hold the **on**/**off** buttons"
   source_url: https://gist.github.com/trilorian/ee957a682ab6a3765e8fbb19502e9bfb
   domain: automation
   input:
@@ -40,25 +40,25 @@ blueprint:
       selector:
         action: {}
     on_double_click_action:
-      name: On - Double click action (Optional)
+      name: On - Double click action
       description: Choose action(s) to run when clicking the **on** button twice.
       default: []
       selector:
         action: {}
     on_triple_click_action:
-      name: On - Triple click action (Optional)
+      name: On - Triple click action
       description: Choose action(s) to run when clicking the **on** button three times.
       default: []
       selector:
         action: {}
     off_double_click_action:
-      name: Off - Double click action (Optional)
+      name: Off - Double click action
       description: Choose action(s) to run when clicking the **off** button twice.
       default: []
       selector:
         action: {}
     off_triple_click_action:
-      name: Off - Triple click action (Optional)
+      name: Off - Triple click action
       description:
         Choose action(s) to run when clicking the **off** button three
         times.
@@ -66,13 +66,13 @@ blueprint:
       selector:
         action: {}
     on_hold_action:
-      name: On - Hold action (Optional)
+      name: On - Hold action
       description: Choose action(s) to run when **on** button is **clicked and held**.
       default: []
       selector:
         action: {}
     off_hold_action:
-      name: Off - Hold action (Optional)
+      name: Off - Hold action
       description: Choose action(s) to run when **off** button is **clicked and held**.
       default: []
       selector:
@@ -186,7 +186,7 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ wait.trigger == none }}"
+                    value_template: "{{ wait.trigger == none and on_click_action != none }}"
                 sequence: !input on_click_action
             default:
               - wait_for_trigger:
@@ -210,14 +210,12 @@ action:
                               - condition: template
                                 value_template: "{{ on_double_click_action != none }}"
                             sequence: !input on_double_click_action
-                        default: !input on_click_action
                 default:
                   - choose:
                       - conditions:
                           - condition: template
                             value_template: "{{ on_triple_click_action != none }}"
                         sequence: !input on_triple_click_action
-                    default: !input on_click_action
   - choose:
       - conditions:
           - condition: trigger
@@ -238,7 +236,7 @@ action:
           - choose:
               - conditions:
                   - condition: template
-                    value_template: "{{ wait.trigger == none }}"
+                    value_template: "{{ wait.trigger == none and off_click_action != none }}"
                 sequence: !input off_click_action
             default:
               - wait_for_trigger:
@@ -262,14 +260,12 @@ action:
                               - condition: template
                                 value_template: "{{ off_double_click_action != none }}"
                             sequence: !input off_double_click_action
-                        default: !input off_click_action
                 default:
                   - choose:
                       - conditions:
                           - condition: template
                             value_template: "{{ off_triple_click_action != none }}"
                         sequence: !input off_triple_click_action
-                    default: !input off_click_action
       - conditions:
           - condition: trigger
             id:
