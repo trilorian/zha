@@ -24,7 +24,7 @@ blueprint:
     Can actually be used for any motion sensor.
     "
 
-  source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
+  source_url: https://github.com/trilorian/zha/blob/main/ikea/traadfri/ikea-traadfri_sensor_E1745_ZHA.yaml
   domain: automation
 
   input:

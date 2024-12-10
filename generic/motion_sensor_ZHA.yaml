@@ -18,7 +18,7 @@ blueprint:
     - Time to wait before performing the motion no longer detected action
     "
 
-  source_url: https://github.com/trilorian/zha/blob/main/ikea-rodret_E2201_ZHA.yaml
+  source_url: https://github.com/trilorian/zha/blob/main/generic/motion_sensor_ZHA.yaml
   domain: automation
 
   input:
@@ -27,10 +27,12 @@ blueprint:
       description: The motion sensor to use.
       default: ""
       selector:
-        entity:
+        device:
           filter:
-            domain: binary_sensor
-            device_class: motion
+            - integration: zha
+          entity:
+            - domain: binary_sensor
+              device_class: motion
           multiple: false
     detected_action:
       name: Motion detected action
@@ -80,11 +82,24 @@ trigger:
 condition: []
 
 action:
-  - choose:
-      - conditions:
-          - condition: trigger
-            id:
-              - motion
+#  - variables:
+#      detected_action: !input detected_action
+#      not_detected_action: !input not_detected_action
+  - alias: "Run the motion detected action"
+    choose: []
+    default: !input detected_action
+  - wait_for_trigger:
+      platform: state
+      entity_id: !input motion_sensor
+      from: "on"
+      to: 'off'
+  - delay:
+      minutes: '{{no_motion_wait}}'
+  - alias: "Run the motion cleared action"
+    choose: []
+    default: !input not_detected_action
+#  - choose:
+#      - conditions:
 #          - type: is_illuminance
 #            condition: device
 #            entity_id: !input motion_sensor
@@ -107,16 +122,22 @@ action:
 #                weekday:
 #                  - sat
 #                  - sun
-        sequence: !input detected_action
+#        sequence:
 #          - type: turn_on
 #            entity_id: !input motion_sensor
 #            domain: light
 #            brightness_pct: 50
-      - conditions:
-          - condition: trigger
-            id:
-              - motion_cleared
-        sequence: !input not_detected_action
 #          - type: turn_off
 #            entity_id: !input motion_sensor
 #            domain: light
+
+#      - conditions:
+#          - condition: trigger
+#            id:
+#              - motion
+#        sequence: !input detected_action
+#      - conditions:
+#          - condition: trigger
+#            id:
+#              - motion_cleared
+#        sequence: !input not_detected_action

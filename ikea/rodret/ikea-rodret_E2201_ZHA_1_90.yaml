@@ -1,6 +1,6 @@
 blueprint:
-  name: IKEA Rodret Dimmer v. 1.3
-  description: "## IKEA RODRET Dimmer remote (v1.86)
+  name: IKEA Rodret Dimmer
+  description: "## IKEA RODRET Dimmer remote (v1.90)
 
     Only for use with [ZHA](https://www.home-assistant.io/integrations/zha/)
 
@@ -12,8 +12,10 @@ blueprint:
 
     - Triple click the **on** or **off** buttons (optional)
 
+    - Quadruple click the **on** or **off** buttons (optional)
+
     - Click and hold the **on**/**off** buttons (optional)"
-  source_url: https://gist.github.com/trilorian/ee957a682ab6a3765e8fbb19502e9bfb
+  source_url: https://gist.github.com/trilorian/9ab79ba93afe09e370bb155b548f7b50
   domain: automation
   input:
     remote_device:
@@ -51,6 +53,12 @@ blueprint:
       default: []
       selector:
         action: {}
+    on_quadruple_click_action:
+      name: On - Quadruple click action (Optional)
+      description: Choose action(s) to run when clicking the **on** button four times.
+      default: []
+      selector:
+        action: {}
     off_double_click_action:
       name: Off - Double click action (Optional)
       description: Choose action(s) to run when clicking the **off** button twice.
@@ -61,6 +69,13 @@ blueprint:
       name: Off - Triple click action (Optional)
       description:
         Choose action(s) to run when clicking the **off** button three
+        times.
+      default: []
+      selector:
+        action: {}
+    off_quadruple_click_action:
+      name: Off - Quadruple click action (Optional)
+      description: Choose action(s) to run when clicking the **off** button four
         times.
       default: []
       selector:
@@ -203,21 +218,37 @@ action:
               - choose:
                   - conditions:
                       - condition: template
-                        value_template: "{{ wait.trigger == none }}"
-                    sequence:
-                      - choose:
-                          - conditions:
-                              - condition: template
-                                value_template: "{{ on_double_click_action != none }}"
-                            sequence: !input on_double_click_action
-                        default: !input on_click_action
+                        value_template: "{{ wait.trigger == none and on_double_click_action != none}}"
+                    sequence: !input on_double_click_action
                 default:
+                  - wait_for_trigger:
+                      - trigger: event
+                        event_type: zha_event
+                        event_data:
+                          device_id: "{{ zha_remote }}"
+                          command: "on"
+                          cluster_id: 6
+                          endpoint_id: 1
                   - choose:
                       - conditions:
                           - condition: template
-                            value_template: "{{ on_triple_click_action != none }}"
+                            value_template: "{{ wait.trigger == none and on_triple_click_action != none }}"
                         sequence: !input on_triple_click_action
-                    default: !input on_click_action
+                    default:
+                      - wait_for_trigger:
+                          - trigger: event
+                            event_type: zha_event
+                            event_data:
+                              device_id: "{{ zha_remote }}"
+                              command: "on"
+                              cluster_id: 6
+                              endpoint_id: 1
+                      - choose:
+                          - conditions:
+                              - condition: template
+                                value_template: "{{ on_triple_click_action != none }}"
+                            sequence: !input on_quadruple_click_action
+                        default: !input on_click_action
   - choose:
       - conditions:
           - condition: trigger
